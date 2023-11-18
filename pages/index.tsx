@@ -3,10 +3,7 @@ import { Inter } from 'next/font/google'
 import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import LibraryAlbum from '@/components/LibraryAlbum/LibraryAlbum';
-// import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
-import { VscArrowLeft, VscArrowRight } from "react-icons/vsc";
-import { BsFillPauseFill, BsFillPlayFill, BsFillSkipBackwardFill, BsFillSkipForwardFill } from "react-icons/bs"
-
+import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -63,6 +60,8 @@ const LIBRARYALBUMS = [
 	}
 ]
 
+// https://developer.apple.com/documentation/applemusicapi/get_all_library_albums
+// GET https://api.music.apple.com/v1/me/library/albums
 const LIBRARY_ALBUMS_API_RESPONSE = {
 	next: "/v1/me/library/albums?offset=2",
 	data: LIBRARYALBUMS
@@ -119,19 +118,11 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 									displayedAlbumId={displayedAlbumId}/>
 
 							<div className={'flex flex-row items-center justify-between py-4'}>
-								{/* <BsFillSkipBackwardFill size={24} onClick={() => handlePrevNext('prev')} /> */}
-								{/* <VscArrowLeft onClick={() => handlePrevNext('prev')} /> */}
-								{/* <IoArrowBack onClick={() => handlePrevNext('prev')} /> */}
-								<div className="cursor-pointer" onClick={() => handlePrevNext('prev')} >{'< prev'}</div>
-
-								{/* <BsFillSkipForwardFill size={24} onClick={() => handlePrevNext('next')} /> */}
-								{/* <VscArrowRight onClick={() => handlePrevNext('next')} /> */}
-								{/* <IoArrowForward onClick={() => handlePrevNext('next')} /> */}
-								<div className="cursor-pointer" onClick={() => handlePrevNext('next')} >{'next >'}</div>
+								<IoArrowBack className="cursor-pointer" onClick={() => handlePrevNext('prev')} />
+								<IoArrowForward className="cursor-pointer" onClick={() => handlePrevNext('next')} />
 							</div>
 						</>
 					: 'No albums to display yet'}
-
 
 			</div>
 		</main>
@@ -140,17 +131,3 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 }
 
 export default Home;
-
-
-// export default function Home: NextPage<{ libraryAlbums: LibraryAlbum[]}> ({ libraryAlbums }){
-
-// 	console.log('libraryAlbums', libraryAlbums)
-
-
-
-//   return (
-//     <main className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}>
-//       Hello
-//     </main>
-//   )
-// }
