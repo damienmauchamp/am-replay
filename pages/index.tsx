@@ -118,8 +118,8 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 									displayedAlbumId={displayedAlbumId}/>
 
 							<div className={'flex flex-row items-center justify-between py-4'}>
-								<IoArrowBack className="cursor-pointer" onClick={() => handlePrevNext('prev')} />
-								<IoArrowForward className="cursor-pointer" onClick={() => handlePrevNext('next')} />
+								<IoArrowBack size={48} className="cursor-pointer" onClick={() => handlePrevNext('prev')} />
+								<IoArrowForward size={48} className="cursor-pointer" onClick={() => handlePrevNext('next')} />
 							</div>
 						</>
 					: 'No albums to display yet'}
