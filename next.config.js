@@ -12,6 +12,11 @@ const nextConfig = {
         // hostname: 'is3-ssl.mzstatic.com',
       }
     ]
+  },
+  env: {
+    APP_NAME: process.env.APP_NAME,
+    APP_BUILD: process.env.APP_BUILD,
+    DEVELOPER_TOKEN: process.env.DEVELOPER_TOKEN,
   }
 }
 

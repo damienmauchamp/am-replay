@@ -1,5 +1,6 @@
 import { Html, Head, Main, NextScript } from 'next/document'
 import Script from 'next/script'
+import MusicProvider from '@/core/MusicKitProvider';
 
 export default function Document() {
   return (
@@ -8,7 +9,7 @@ export default function Document() {
       <body>
         <Main />
         <NextScript />
-        <Script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"></Script>
+        <script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js" defer></script>
       </body>
     </Html>
   )

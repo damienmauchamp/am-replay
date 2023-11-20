@@ -4,6 +4,9 @@ import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import LibraryAlbum from '@/components/LibraryAlbum/LibraryAlbum';
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
+import MusicProvider from '@/core/MusicKitProvider';
+import AMLoginButton from '@/components/AMLoginButton/AMLoginButton';
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -67,21 +70,58 @@ const LIBRARY_ALBUMS_API_RESPONSE = {
 	data: LIBRARYALBUMS
 };
 
+//
+// let musicProvider = MusicProvider.sharedProvider();
+// musicProvider.configure();
+// let musicInstance = musicProvider.getMusicInstance();
+//
+
 export const getStaticProps = async() => {
 	const libraryAlbums: LibraryAlbum[] = LIBRARY_ALBUMS_API_RESPONSE.data;
 	return {
 		props: {
-			libraryAlbums: libraryAlbums
+			libraryAlbums: libraryAlbums,
 		},
 		revalidate: 3600,
 	}
 }
 
 
+// todo : Error wrap si erreur de chargement du musicKit
+// const Home: NextPage<{ libraryAlbums: LibraryAlbum[], musicInstance:any }> = ({ libraryAlbums, musicInstance }) => {
 const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) => {
 
+	const [musicKit, setMusicKit] = useState<any>(null)
 	const [displayedAlbumId, setDisplayedAlbumId] = useState<number>(0)
-	
+	const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
+
+	const loadMusicKit = () => {
+		console.log('loadMusicKit')
+
+		let musicProvider = MusicProvider.sharedProvider();
+		console.log('musicProvider', musicProvider);
+		
+		musicProvider.configure();
+
+		setMusicKit(musicProvider.getMusicInstance());
+		
+		// let musicInstance = musicProvider.getMusicInstance();
+		// console.log('musicInstance', musicInstance);
+		// console.log('musicProvider.getMusicInstance()', musicProvider.getMusicInstance());
+		
+		// setMusicKit(musicInstance);
+	}
+
+	useEffect(() => {
+		console.log('useEffect', process.env);
+		loadMusicKit();
+	}, []);
+
+	useEffect(() => {
+		console.log('useEffect.musicKit', musicKit?.isAuthorized || false);
+		setIsAuthorized(musicKit?.isAuthorized || false)
+	}, [musicKit])
+	  
 	const handlePrevNext = (direction: string) => {
 
 		let numberLibraryAlbums = libraryAlbums.length
@@ -109,6 +149,42 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 
 	return (
 		<main className={`flex min-h-screen flex-col items-center justify-between p-12 ${inter.className}`}>
+
+			<nav>
+				AM : <AMLoginButton musicKit={musicKit}
+									updateMusicKit={(mk: any) => {
+										// console.log('updateMusicKit', {
+										// 	musicKit: musicKit,
+										// 	mk: mk,
+										// 	new: {...mk, ...musicKit},
+										// })
+										// setMusicKit({...mk, ...musicKit})
+										setMusicKit(mk)
+									}}/>
+
+				<br/>
+				<br/>
+				PARENT :
+				<ul>
+					<li> - {isAuthorized} : {Number(isAuthorized)}</li>
+					<li><button onClick={() => {
+						console.log('authorize')
+
+						musicKit.authorize().then((response: any) => {
+							console.log('response', response)
+						}).catch(console.error)
+
+					}}>authorize</button></li>
+					<li><button onClick={() => {
+						console.log('unauthorize')
+
+						musicKit.unauthorize().then((response: any) => {
+							console.log('response', response)
+						}).catch(console.error)
+
+					}}>unauthorize</button></li>
+				</ul>
+			</nav>
 
 			<div className=''>
 
