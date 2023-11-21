@@ -173,7 +173,9 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 			// filtering
 			const year = 2023;
 			const onlyAlbums = response.filter(a => !String(a.attributes.name).endsWith('- Single')
-														&& !String(a.attributes.name).endsWith('- EP'))
+														&& !String(a.attributes.name).endsWith('- EP')
+														// && String(a.attributes.artwork.url)
+														)
 			const yearAlbums = onlyAlbums.filter(a => String(a.attributes.releaseDate).startsWith(`${year}-`))
 
 			// if (!yearAlbums.length) {
@@ -212,6 +214,7 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 	useEffect(() => {
 		console.log('useEffect.loop', loop);
 		if (!loop) {
+			setAlbumFetching(false)
 			return;
 		}
 
@@ -276,6 +279,16 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 		}).catch(console.error)
 	}
 
+	const stopLoading = () => {
+		setLoop(false);
+	}
+
+	const resetPage = () => {
+		stopLoading()
+		setAlbums([])
+		setApiPage(1);
+	}
+
 	return (
 		<main className={`flex min-h-screen flex-col items-center justify-between p-12 ${inter.className}`}>
 
@@ -302,6 +315,18 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 					<>
 						<br/>
 						<button onClick={() => loadAllAlbums()}>loadAllAlbums()</button>
+					</>
+					: ''}
+				{isAuthorized ? 
+					<>
+						<br/>
+						<button onClick={() => stopLoading()}>stopLoading()</button>
+					</>
+					: ''}
+				{isAuthorized ? 
+					<>
+						<br/>
+						<button onClick={() => resetPage()}>resetPage()</button>
 					</>
 					: ''}
 
@@ -347,6 +372,7 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 
 				<br />
 				<div>Nb: { albums ? albums.length : 'NULL'} - {albumFetching ? `Fetching page ${apiPage}...` : 'Done'}</div>
+				<div>Page : { apiPage }</div>
 			</div>
 		</main>
 	)

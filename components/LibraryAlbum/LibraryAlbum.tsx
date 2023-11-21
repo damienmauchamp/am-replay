@@ -30,6 +30,9 @@ const LibraryAlbum = (props: {album: LibraryAlbum, displayedAlbumId: number}) =>
 	const defaultSize = 500;
 
 	const getImageUrl = (album: LibraryAlbum, size:number = defaultSize) => {
+		if (!album.attributes.artwork || !album.attributes.artwork.url) {
+			return '';
+		}
 		return album.attributes.artwork.url
 			.replace('{w}', String(size))
 			.replace('{h}', String(size));
