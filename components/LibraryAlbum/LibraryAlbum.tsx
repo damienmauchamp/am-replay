@@ -43,6 +43,7 @@ const LibraryAlbum = (props: {album: LibraryAlbum, displayedAlbumId: number}) =>
 				<p>ID: {props.displayedAlbumId}</p>
 				<p>{props.album.attributes.name}</p>
 				<p>{props.album.attributes.artistName}</p>
+				<p>{props.album.attributes.releaseDate}</p>
 			</div>
 		</>
 	)
