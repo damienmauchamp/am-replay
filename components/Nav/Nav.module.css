@@ -1,0 +1,9 @@
+.nav {
+	@apply flex flex-row gap-2 w-full p-4;
+}
+
+/* tests */
+
+.nav {
+	@apply flex-wrap bg-gray-800 justify-center;
+}

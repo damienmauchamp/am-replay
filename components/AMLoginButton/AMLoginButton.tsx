@@ -2,36 +2,25 @@ import { useEffect, useState } from 'react'
 import classes from './AMLoginButton.module.css'
 
 
-const AMLoginButton = (props: { musicKit:any, updateMusicKit: any }) => {
+const AMLoginButton = (props: { musicKit: MusicKit.MusicKitInstance, updateMusicKit: Function }) => {
 
 	const [loading, setLoading] = useState<boolean>(true)
-	const [logged, setLogged] = useState<boolean>(props.musicKit?.isAuthorized)
+	const [logged, setLogged] = useState<boolean>(props.musicKit?.isAuthorized || false)
 
-	// todo : à déplacer
-	const getHeaders = () => {
-		console.log(props.musicKit)
-		// const music = props.MusicKit.getInstance();
-	  
-		return {
-		  Authorization: `Bearer ${props.musicKit.developerToken}`,
-		  Accept: 'application/json',
-		  'Content-Type': 'application/json',
-		  'Music-User-Token': props.musicKit.musicUserToken,
-		};
-	  }
+	console.log('AM logged:', logged);
 
 	const handleLogin = () => {
 		console.log('handleLogin', props.musicKit?.isAuthorized);
 
 		if (logged) {
 			// Already logged
+			console.log('Already logged');
 			return;
 		}
 
 		setLoading(true);
 
 		console.log('props.musicKit', props.musicKit);
-		console.log('getHeaders()', getHeaders());
 
 		// 
 		props.musicKit.authorize().then((response: any) => {
@@ -87,10 +76,6 @@ const AMLoginButton = (props: { musicKit:any, updateMusicKit: any }) => {
 							onClick={handleLogin}>{logged ? 'Logged!' : 'Login'}</button>
 					
 					<br />
-
-					<button onClick={() => {
-						console.log(getHeaders())
-					}}>getHeaders()</button>
 				</>
 						}
 		</>

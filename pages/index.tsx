@@ -7,6 +7,8 @@ import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
 import MusicProvider from '@/core/MusicKitProvider';
 import AMLoginButton from '@/components/AMLoginButton/AMLoginButton';
 import { LIBRARY_ALBUMS_API_RESPONSE } from '@/data/LibraryAlbumsExample'
+import { Nav } from '@/components/Nav/Nav';
+import { Home } from '@/components/Home/Home';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -24,13 +26,14 @@ export const getStaticProps = async() => {
 
 
 // todo : Error wrap si erreur de chargement du musicKit
-const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) => {
+const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) => {
+
+	const [loading, setLoading] = useState<boolean>(false)
+	const [musicKit, setMusicKit] = useState<MusicKit.MusicKitInstance>({} as MusicKit.MusicKitInstance)
 
 	const apiLimit = 100;
 
-	const [loading, setLoading] = useState<boolean>(false)
 	const [albumFetching, setAlbumFetching] = useState<boolean>(false)
-	const [musicKit, setMusicKit] = useState<MusicKit.MusicKitInstance>()
 	const [displayedAlbumId, setDisplayedAlbumId] = useState<number>(0)
 	const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
 	const [albums, setAlbums] = useState<Array<any>>(libraryAlbums)
@@ -220,42 +223,24 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 	}
 
 	return (
-		<main className={`flex min-h-screen flex-col items-center justify-between p-12 ${inter.className}`}>
+		<>
+		<Nav 	musicKit={musicKit} 
+				updateMusicKit={updateMusicKit}
+				handleLogout={handleLogout} />
 
-			<nav className='flex flex-row flex-wrap gap-2'>
-				AM : <AMLoginButton musicKit={musicKit}
-									updateMusicKit={updateMusicKit}/>
-				{isAuthorized ? 
-					<>
-						<br/>
-						<button onClick={handleLogout}>Logout</button>
-					</>
-					: ''}
-				{isAuthorized ? 
-					<>
-						<br/>
-						<button onClick={() => loadAlbums()}>loadAlbums()</button>
-					</>
-					: ''}
-				{isAuthorized ? 
-					<>
-						<br/>
-						<button onClick={() => loadAllAlbums()}>loadAllAlbums()</button>
-					</>
-					: ''}
-				{isAuthorized ? 
-					<>
-						<br/>
-						<button onClick={() => stopLoading()}>stopLoading()</button>
-					</>
-					: ''}
-				{isAuthorized ? 
-					<>
-						<br/>
-						<button onClick={() => resetPage()}>resetPage()</button>
-					</>
-					: ''}
-			</nav>
+
+		<main className={`flex min-h-screen flex-col items-center justify-between p-12 ${inter.className}`}>
+			<Home />
+
+
+		{isAuthorized ?
+			<div className='flex flex-row flex-wrap gap-2'>
+					<button onClick={() => loadAlbums()}>loadAlbums()</button>
+					<button onClick={() => loadAllAlbums()}>loadAllAlbums()</button>
+					<button onClick={() => stopLoading()}>stopLoading()</button>
+					<button onClick={() => resetPage()}>resetPage()</button>
+			</div>
+ 			: ''}
 
 			<div className=''>
 				{loading ? 'LOADING...' : ''}
@@ -278,8 +263,9 @@ const Home: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) =>
 				<div>Page : { apiPage }</div>
 			</div>
 		</main>
+		</>
 	)
 
 }
 
-export default Home;
+export default Landing;
