@@ -1,83 +1,103 @@
 import { useEffect, useState } from 'react'
 import classes from './AMLoginButton.module.css'
 
+const log = (...args: any) => {
+	console.log('%c[AMLoginButton]', 'color:red', ...args)
+}
 
-const AMLoginButton = (props: { musicKit: MusicKit.MusicKitInstance, updateMusicKit: Function }) => {
-
+const AMLoginButton = (props: {
+	musicKit: MusicKit.MusicKitInstance
+	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
+}) => {
 	const [loading, setLoading] = useState<boolean>(true)
-	const [logged, setLogged] = useState<boolean>(props.musicKit?.isAuthorized || false)
+	const [isLogging, setIsLogging] = useState<boolean>(false)
+	const [logged, setLogged] = useState<boolean>(
+		props.musicKit?.isAuthorized || false
+	)
 
-	console.log('AM logged:', logged);
+	log('logged:', logged)
+	log('render:', {
+		loading: loading,
+		isLogging: isLogging,
+		logged: logged,
+		'props.musicKit': props.musicKit,
+		'props.onLogin': props.onLogin,
+	})
 
+	/**
+	 * Login
+	 */
 	const handleLogin = () => {
-		console.log('handleLogin', props.musicKit?.isAuthorized);
+		log(
+			'(handleLogin) props.musicKit?.isAuthorized',
+			props.musicKit?.isAuthorized
+		)
 
 		if (logged) {
 			// Already logged
-			console.log('Already logged');
-			return;
+			log('(handleLogin) Already logged')
+			return
 		}
 
-		setLoading(true);
+		setIsLogging(true)
 
-		console.log('props.musicKit', props.musicKit);
+		//
+		return props.musicKit
+			.authorize()
+			.then((response: any) => {
+				log('(handleLogin) authorized reponse:', response)
 
-		// 
-		props.musicKit.authorize().then((response: any) => {
-			console.log('OK !', response);
+				// updating musicKit
+				props.onLogin(props.musicKit)
 
-			props.updateMusicKit(props.musicKit)
+				setIsLogging(false)
+				setLogged(true)
+			})
+			.catch((err: any) => {
+				log('(handleLogin) authorized ERROR:', err)
+				console.error(err)
 
-			setLoading(false);
-			setLogged(true);
-		}).catch((err: any) => {
-			console.log('NOPE', err);
+				// updating musicKit
+				props.onLogin(props.musicKit)
 
-			props.updateMusicKit(props.musicKit)
-
-			console.error(err);
-			setLoading(false);
-			// props.musicKit?.isAuthorized = false;
-		})
-
-		// setTimeout(() => {
-
-		// 	console.log('logged now');
-		// 	setLogged(true);
-
-		// }, 2500);
+				setIsLogging(false)
+			})
 	}
 
 	useEffect(() => {
-
+		log('useEffect[]:', logged)
 		// console.log('useEffect[]: ', {
 		// 	'props.musicKit?.isAuthorized': props.musicKit?.isAuthorized,
 		// })
 		// setLogged(props.musicKit?.isAuthorized);
 
 		setTimeout(() => {
-			setLoading(false);
+			setLoading(false)
 		}, 500)
-	}, []);
+	}, [])
 
 	useEffect(() => {
-		console.log('useEffect: props.musicKit?.isAuthorized =', props.musicKit?.isAuthorized)
-		
-		setLogged(props.musicKit?.isAuthorized);
-
+		log(
+			'useEffect[props.musicKit?.isAuthorized]:',
+			props.musicKit?.isAuthorized
+		)
+		setLogged(props.musicKit?.isAuthorized)
 	}, [props.musicKit?.isAuthorized])
 
 	return (
 		<>
-			{loading ? 
-				<div>LOADING...</div> : 
-				<>
-					<button className={logged ? classes.buttonBgConnected : classes.buttonBg}
-							onClick={handleLogin}>{logged ? 'Logged!' : 'Login'}</button>
-					
-					<br />
-				</>
-						}
+			{loading ? (
+				<div>LOADING...</div>
+			) : (
+				<button
+					className={
+						logged ? classes.buttonBgConnected : classes.buttonBg
+					}
+					onClick={handleLogin}
+				>
+					{logged ? 'Logged' : isLogging ? 'Logging in' : 'Login'}
+				</button>
+			)}
 		</>
 	)
 }

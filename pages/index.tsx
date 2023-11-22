@@ -1,20 +1,22 @@
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { NextPage } from 'next';
-import { useEffect, useState } from 'react';
-import LibraryAlbum from '@/components/LibraryAlbum/LibraryAlbum';
+import { NextPage } from 'next'
+import { useEffect, useState } from 'react'
+import LibraryAlbum from '@/components/LibraryAlbum/LibraryAlbum'
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
-import MusicProvider from '@/core/MusicKitProvider';
-import AMLoginButton from '@/components/AMLoginButton/AMLoginButton';
+import MusicProvider from '@/core/MusicKitProvider'
 import { LIBRARY_ALBUMS_API_RESPONSE } from '@/data/LibraryAlbumsExample'
-import { Nav } from '@/components/Nav/Nav';
-import { Home } from '@/components/Home/Home';
+import { Nav } from '@/components/Nav/Nav'
+import { Home } from '@/components/Home/Home'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const log = (...args: any) => {
+	console.log('%c[index]', 'color:cyan', ...args)
+}
+
 // static props
-export const getStaticProps = async() => {
-	const libraryAlbums: LibraryAlbum[] = LIBRARY_ALBUMS_API_RESPONSE.data;
+export const getStaticProps = async () => {
+	const libraryAlbums: LibraryAlbum[] = LIBRARY_ALBUMS_API_RESPONSE.data
 	return {
 		props: {
 			libraryAlbums: [] as LibraryAlbum[],
@@ -24,14 +26,16 @@ export const getStaticProps = async() => {
 	}
 }
 
-
 // todo : Error wrap si erreur de chargement du musicKit
-const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums }) => {
-
+const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
+	libraryAlbums,
+}) => {
 	const [loading, setLoading] = useState<boolean>(false)
-	const [musicKit, setMusicKit] = useState<MusicKit.MusicKitInstance>({} as MusicKit.MusicKitInstance)
+	const [musicKit, setMusicKit] = useState<MusicKit.MusicKitInstance>(
+		{} as MusicKit.MusicKitInstance
+	)
 
-	const apiLimit = 100;
+	const apiLimit = 100
 
 	const [albumFetching, setAlbumFetching] = useState<boolean>(false)
 	const [displayedAlbumId, setDisplayedAlbumId] = useState<number>(0)
@@ -40,232 +44,313 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({ libraryAlbums })
 	const [apiPage, setApiPage] = useState<number>(1)
 	const [fetchComplete, setFetchComplete] = useState<boolean>(false)
 	const [loop, setLoop] = useState<boolean>(false)
-	
-	const loopMaxPage = 999;
+
+	const loopMaxPage = 999
 	let loopPages: number[] = []
 
 	const loadMusicKit = () => {
 		console.log('loadMusicKit')
 
-		let musicProvider = MusicProvider.sharedProvider();
-		console.log('musicProvider', musicProvider);
-		
-		musicProvider.configure();
+		let musicProvider = MusicProvider.sharedProvider()
+		console.log('musicProvider', musicProvider)
 
-		setMusicKit(musicProvider.getMusicInstance());
-		
+		musicProvider.configure()
+
+		setMusicKit(musicProvider.getMusicInstance())
+
 		// let musicInstance = musicProvider.getMusicInstance();
 		// console.log('musicInstance', musicInstance);
 		// console.log('musicProvider.getMusicInstance()', musicProvider.getMusicInstance());
-		
+
 		// setMusicKit(musicInstance);
 	}
 
 	const loadAllAlbums = () => {
 		setAlbumFetching(true)
-		setLoop(true);
+		setLoop(true)
 	}
 
 	const loadAlbums = (data: any = {}) => {
-
-		console.log('loadAlbums', {
-			isAuthorized: isAuthorized,
-			fetchComplete: fetchComplete,
-			apiPage: apiPage,
-			loop: loop,
-			loopMaxPage: loopMaxPage,
-			data: data,
-		}, data)
+		console.log(
+			'loadAlbums',
+			{
+				isAuthorized: isAuthorized,
+				fetchComplete: fetchComplete,
+				apiPage: apiPage,
+				loop: loop,
+				loopMaxPage: loopMaxPage,
+				data: data,
+			},
+			data
+		)
 
 		if (!isAuthorized || !musicKit || !musicKit.api) {
-			return;
+			return
 		}
-		
+
 		setLoading(true)
 
 		console.log('loadAlbums: musicKit.api', musicKit.api)
 		console.log('loadAlbums: musicKit.api.library', musicKit.api.library)
 
-		const params :MusicKit.QueryParameters = {
+		const params: MusicKit.QueryParameters = {
 			limit: apiLimit,
-			offset: (apiPage - 1) * apiLimit
+			offset: (apiPage - 1) * apiLimit,
 		}
-		
+
 		console.log('loadAlbums: params:', params)
 
-		return musicKit.api.library.albums(null, params).then((response: MusicKit.Resource[]) => {
+		return musicKit.api.library
+			.albums(null, params)
+			.then((response: MusicKit.Resource[]) => {
+				console.log('loadAlbums OK: response', response)
 
-			console.log('loadAlbums OK: response',  response)
+				if (response !== undefined && !response.length) {
+					console.log('loadAlbums COMPLETE')
+					setFetchComplete(true)
+					setLoading(false)
+					setAlbumFetching(false)
+					return
+				}
 
-			if (response !== undefined && !response.length) {
-				console.log('loadAlbums COMPLETE')
-				setFetchComplete(true)
+				const libraryAlbums: LibraryAlbum[] = response as LibraryAlbum[]
+
+				// filtering
+				const year = 2023
+				const onlyAlbums: LibraryAlbum[] = libraryAlbums.filter(
+					(a) =>
+						!String(a.attributes.name).endsWith('- Single') &&
+						!String(a.attributes.name).endsWith('- EP')
+					// && String(a.attributes.artwork.url)
+				)
+				const yearAlbums: LibraryAlbum[] = onlyAlbums.filter((a) =>
+					String(a.attributes.releaseDate).startsWith(`${year}-`)
+				)
+
+				if (yearAlbums.length) {
+					console.log('loadAlbums[V]: setAlbums:', [
+						...albums,
+						...yearAlbums,
+					])
+					setAlbums([...albums, ...yearAlbums])
+				}
 				setLoading(false)
-				setAlbumFetching(false)
-				return;
-			}
+				setApiPage(apiPage + 1)
 
-			const libraryAlbums :LibraryAlbum[] = response as LibraryAlbum[]
-
-			// filtering
-			const year = 2023;
-			const onlyAlbums :LibraryAlbum[] = libraryAlbums.filter(a => !String(a.attributes.name).endsWith('- Single')
-														&& !String(a.attributes.name).endsWith('- EP')
-														// && String(a.attributes.artwork.url)
-														)
-			const yearAlbums :LibraryAlbum[] = onlyAlbums.filter(a => String(a.attributes.releaseDate).startsWith(`${year}-`))
-
-			if (yearAlbums.length) {
-				console.log('loadAlbums[V]: setAlbums:', [...albums, ...yearAlbums])
-				setAlbums([...albums, ...yearAlbums])
-			}
-			setLoading(false)
-			setApiPage(apiPage + 1)
-
-			console.log('loadAlbums[V]: albums:', albums)
-			console.log('loadAlbums[V]: apiPage:', apiPage)
-
-		}).catch((error:any) => {
-			console.error('loadAlbums OK: error', error)
-			setLoading(false)
-		})
+				console.log('loadAlbums[V]: albums:', albums)
+				console.log('loadAlbums[V]: apiPage:', apiPage)
+			})
+			.catch((error: any) => {
+				console.error('loadAlbums OK: error', error)
+				setLoading(false)
+			})
 	}
 
 	useEffect(() => {
+		log('useEffect[isAuthorized]:', isAuthorized)
+
 		if (isAuthorized) {
 			loadAlbums()
 		}
 	}, [isAuthorized])
 
 	useEffect(() => {
-		console.log('useEffect', process.env);
-		loadMusicKit();
+		log('useEffect[musicKit?.isAuthorized]:', musicKit?.isAuthorized)
+
+		loadMusicKit()
 		setIsAuthorized(musicKit?.isAuthorized || false)
-		setLoop(false);
-	}, [musicKit?.isAuthorized]);
+		setLoop(false)
+	}, [musicKit?.isAuthorized])
 
 	useEffect(() => {
-		console.log('useEffect.loop', loop);
+		log('useEffect[apiPage, loop]:', apiPage, loop)
+
 		if (!loop) {
 			setAlbumFetching(false)
-			return;
+			return
 		}
 
-		if (fetchComplete || apiPage > loopMaxPage) {
-			console.log('stop');
+		if (fetchComplete || (loopMaxPage !== null && apiPage > loopMaxPage)) {
+			log('useEffect[apiPage, loop]: stop')
 			setAlbumFetching(false)
 			setLoop(false)
-			return;
+			return
 		}
 
 		if (loopPages.includes(apiPage)) {
-			console.log('bah wtf?', apiPage)
+			log('useEffect[apiPage, loop]: wtf', apiPage)
 			setAlbumFetching(false)
 			setLoop(false)
-			return;
+			return
 		}
 
 		loopPages.push(apiPage)
 
-		loadAlbums();
+		loadAlbums()
 	}, [apiPage, loop])
-	  
-	const handlePrevNext = (direction: string) => {
 
+	const handlePrevNext = (direction: string) => {
 		let numberLibraryAlbums = albums.length
 		let thisDisplayedAlbumId = displayedAlbumId
 
-		switch(direction) {
+		switch (direction) {
 			case 'prev':
 				thisDisplayedAlbumId--
-				if(thisDisplayedAlbumId < 0) {
+				if (thisDisplayedAlbumId < 0) {
 					thisDisplayedAlbumId = numberLibraryAlbums - 1
-				}  
-				break;
-			case 'next': 
+				}
+				break
+			case 'next':
 				thisDisplayedAlbumId++
-				if(thisDisplayedAlbumId >= numberLibraryAlbums) {
+				if (thisDisplayedAlbumId >= numberLibraryAlbums) {
 					thisDisplayedAlbumId = 0
 				}
-				break;
-			default: return;
+				break
+			default:
+				return
 		}
 
 		setDisplayedAlbumId(thisDisplayedAlbumId)
 	}
 
-	const handleLogout = () => {
-		if (!musicKit) {
-			setIsAuthorized(false)
-			return;
-		}
+	const handleLogin = (mk: MusicKit.MusicKitInstance) => {
+		log('(handleLogin) mk:', mk)
 
-		musicKit.unauthorize().then((response: any) => {
-			setMusicKit(musicKit)
-			setIsAuthorized(false)
-		}).catch(console.error)
-	}
-
-	const updateMusicKit = (mk: any) => {
 		setMusicKit(mk)
 		setIsAuthorized(mk?.isAuthorized || false)
 		loadAlbums()
 	}
 
+	const handleLogout = () => {
+		log('(handleLogout)')
+
+		if (!musicKit) {
+			setIsAuthorized(false)
+			return musicKit
+		}
+
+		musicKit.unauthorize()
+		setMusicKit(musicKit)
+		setIsAuthorized(false)
+		resetPage()
+
+		return musicKit
+
+		// return musicKit
+		// 	.unauthorize()
+		// 	.then((response: any) => {
+		// 		log('(unauthorize) musicKit:', musicKit)
+
+		// 		setMusicKit(musicKit)
+		// 		setIsAuthorized(false)
+		// 		resetPage()
+		// 		return musicKit
+		// 	})
+		// 	.catch((err) => {
+		// 		console.error(err)
+		// 		return musicKit
+		// 	})
+
+		// return musicKit
+		// 	.unauthorize()
+		// 	.then((response: any) => {
+		// 		log('(unauthorize) musicKit:', musicKit)
+
+		// 		setMusicKit(musicKit)
+		// 		setIsAuthorized(false)
+		// 		resetPage()
+		// 		return musicKit
+		// 	})
+		// 	.catch((err) => {
+		// 		console.error(err)
+		// 		return musicKit
+		// 	})
+	}
+
 	const stopLoading = () => {
-		setLoop(false);
+		setLoop(false)
 	}
 
 	const resetPage = () => {
 		stopLoading()
 		setAlbums([])
-		setApiPage(1);
+		setApiPage(1)
 	}
 
 	return (
 		<>
-		<Nav 	musicKit={musicKit} 
-				updateMusicKit={updateMusicKit}
-				handleLogout={handleLogout} />
+			<Nav
+				musicKit={musicKit}
+				onLogin={handleLogin}
+				onLogout={handleLogout}
+			/>
 
+			<main
+				className={`flex min-h-screen flex-col items-center p-12 ${inter.className}`}
+			>
+				<Home musicKit={musicKit} />
 
-		<main className={`flex min-h-screen flex-col items-center justify-between p-12 ${inter.className}`}>
-			<Home />
+				{isAuthorized ? (
+					<>
+						<div className="flex flex-row flex-wrap gap-2">
+							<button onClick={() => loadAlbums()}>
+								loadAlbums()
+							</button>
+							<button onClick={() => loadAllAlbums()}>
+								loadAllAlbums()
+							</button>
+							<button onClick={() => stopLoading()}>
+								stopLoading()
+							</button>
+							<button onClick={() => resetPage()}>
+								resetPage()
+							</button>
+						</div>
 
+						{albums.length ? (
+							<>
+								<LibraryAlbum
+									album={albums[displayedAlbumId]}
+									displayedAlbumId={displayedAlbumId}
+								/>
+								<div
+									className={
+										'flex flex-row items-center justify-between py-4'
+									}
+								>
+									<IoArrowBack
+										size={48}
+										className="cursor-pointer"
+										onClick={() => handlePrevNext('prev')}
+									/>
+									<IoArrowForward
+										size={48}
+										className="cursor-pointer"
+										onClick={() => handlePrevNext('next')}
+									/>
+								</div>
+							</>
+						) : (
+							'No albums to display yet'
+						)}
+					</>
+				) : (
+					'Please log in'
+				)}
 
-		{isAuthorized ?
-			<div className='flex flex-row flex-wrap gap-2'>
-					<button onClick={() => loadAlbums()}>loadAlbums()</button>
-					<button onClick={() => loadAllAlbums()}>loadAllAlbums()</button>
-					<button onClick={() => stopLoading()}>stopLoading()</button>
-					<button onClick={() => resetPage()}>resetPage()</button>
-			</div>
- 			: ''}
+				<div className="">
+					{loading ? 'LOADING...' : ''}
 
-			<div className=''>
-				{loading ? 'LOADING...' : ''}
-				
-
-				{ albums.length
-					?  <>
-						<LibraryAlbum album={albums[displayedAlbumId]}
-									displayedAlbumId={displayedAlbumId}/>
-
-							<div className={'flex flex-row items-center justify-between py-4'}>
-								<IoArrowBack size={48} className="cursor-pointer" onClick={() => handlePrevNext('prev')} />
-								<IoArrowForward size={48} className="cursor-pointer" onClick={() => handlePrevNext('next')} />
-							</div>
-						</>
-					: 'No albums to display yet'}
-
-				<br />
-				<div>Nb: { albums ? albums.length : 'NULL'} - {albumFetching ? `Fetching page ${apiPage}...` : 'Done'}</div>
-				<div>Page : { apiPage }</div>
-			</div>
-		</main>
+					<br />
+					<div>
+						Nb: {albums ? albums.length : 'NULL'} -{' '}
+						{albumFetching ? `Fetching page ${apiPage}...` : 'Done'}
+					</div>
+					<div>Page : {apiPage}</div>
+				</div>
+			</main>
 		</>
 	)
-
 }
 
-export default Landing;
+export default Landing
