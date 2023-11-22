@@ -31,7 +31,7 @@ const LibraryAlbum = (props: {album: LibraryAlbum, displayedAlbumId: number}) =>
 
 	const getImageUrl = (album: LibraryAlbum, size:number = defaultSize) => {
 		if (!album.attributes.artwork || !album.attributes.artwork.url) {
-			return '';
+			return '/img/default-cover.jpg';
 		}
 		return album.attributes.artwork.url
 			.replace('{w}', String(size))
@@ -41,8 +41,10 @@ const LibraryAlbum = (props: {album: LibraryAlbum, displayedAlbumId: number}) =>
 	return (
 		<>
 			<div>
-				<Image className='' src={getImageUrl(props.album, defaultSize)} alt={`${props.album.attributes.name} by ${props.album.attributes.artistName}`}
-					width={defaultSize} height={defaultSize} />
+				<Image 	className={classes.artwork} 
+						src={getImageUrl(props.album, defaultSize)} 
+						alt={`${props.album.attributes.name} by ${props.album.attributes.artistName}`}
+						width={defaultSize} height={defaultSize} />
 				<p>ID: {props.displayedAlbumId}</p>
 				<p>{props.album.attributes.name}</p>
 				<p>{props.album.attributes.artistName}</p>

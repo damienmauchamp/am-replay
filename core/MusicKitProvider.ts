@@ -28,7 +28,7 @@ export default class MusicProvider {
         });
     }
 
-    getMusicInstance() {
+    getMusicInstance(): MusicKit.MusicKitInstance {
 		console.log('Getting MusicKit instance')
         return window.MusicKit.getInstance();
     }
