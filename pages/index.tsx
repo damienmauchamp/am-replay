@@ -7,6 +7,8 @@ import MusicProvider from '@/core/MusicKitProvider'
 import { LIBRARY_ALBUMS_API_RESPONSE } from '@/data/LibraryAlbumsExample'
 import { Nav } from '@/components/Nav/Nav'
 import { Home } from '@/components/Home/Home'
+import MusicKitProvider from '@/components/Providers/MusicKitProvider'
+import MyComponent from '@/components/Tests/MyComponent'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -235,36 +237,6 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 		resetPage()
 
 		return musicKit
-
-		// return musicKit
-		// 	.unauthorize()
-		// 	.then((response: any) => {
-		// 		log('(unauthorize) musicKit:', musicKit)
-
-		// 		setMusicKit(musicKit)
-		// 		setIsAuthorized(false)
-		// 		resetPage()
-		// 		return musicKit
-		// 	})
-		// 	.catch((err) => {
-		// 		console.error(err)
-		// 		return musicKit
-		// 	})
-
-		// return musicKit
-		// 	.unauthorize()
-		// 	.then((response: any) => {
-		// 		log('(unauthorize) musicKit:', musicKit)
-
-		// 		setMusicKit(musicKit)
-		// 		setIsAuthorized(false)
-		// 		resetPage()
-		// 		return musicKit
-		// 	})
-		// 	.catch((err) => {
-		// 		console.error(err)
-		// 		return musicKit
-		// 	})
 	}
 
 	const stopLoading = () => {
@@ -279,76 +251,86 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 
 	return (
 		<>
-			<Nav
-				musicKit={musicKit}
-				onLogin={handleLogin}
-				onLogout={handleLogout}
-			/>
+			<MusicKitProvider>
+				<MyComponent test={'OUIIII'} />
 
-			<main
-				className={`flex min-h-screen flex-col items-center p-12 ${inter.className}`}
-			>
-				<Home musicKit={musicKit} />
+				<Nav
+					musicKit={musicKit}
+					onLogin={handleLogin}
+					onLogout={handleLogout}
+				/>
 
-				{isAuthorized ? (
-					<>
-						<div className="flex flex-row flex-wrap gap-2">
-							<button onClick={() => loadAlbums()}>
-								loadAlbums()
-							</button>
-							<button onClick={() => loadAllAlbums()}>
-								loadAllAlbums()
-							</button>
-							<button onClick={() => stopLoading()}>
-								stopLoading()
-							</button>
-							<button onClick={() => resetPage()}>
-								resetPage()
-							</button>
+				<main
+					className={`flex min-h-screen flex-col items-center p-12 ${inter.className}`}
+				>
+					<Home musicKit={musicKit} />
+
+					{isAuthorized ? (
+						<>
+							<div className="flex flex-row flex-wrap gap-2">
+								<button onClick={() => loadAlbums()}>
+									loadAlbums()
+								</button>
+								<button onClick={() => loadAllAlbums()}>
+									loadAllAlbums()
+								</button>
+								<button onClick={() => stopLoading()}>
+									stopLoading()
+								</button>
+								<button onClick={() => resetPage()}>
+									resetPage()
+								</button>
+							</div>
+
+							{albums.length ? (
+								<>
+									<LibraryAlbum
+										album={albums[displayedAlbumId]}
+										displayedAlbumId={displayedAlbumId}
+									/>
+									<div
+										className={
+											'flex flex-row items-center justify-between py-4'
+										}
+									>
+										<IoArrowBack
+											size={48}
+											className="cursor-pointer"
+											onClick={() =>
+												handlePrevNext('prev')
+											}
+										/>
+										<IoArrowForward
+											size={48}
+											className="cursor-pointer"
+											onClick={() =>
+												handlePrevNext('next')
+											}
+										/>
+									</div>
+								</>
+							) : (
+								'No albums to display yet'
+							)}
+						</>
+					) : (
+						'Please log in'
+					)}
+
+					<div className="">
+						{loading ? 'LOADING...' : ''}
+
+						<br />
+						<div>
+							Nb: {albums ? albums.length : 'NULL'} -{' '}
+							{albumFetching
+								? `Fetching page ${apiPage}...`
+								: 'Done'}
 						</div>
-
-						{albums.length ? (
-							<>
-								<LibraryAlbum
-									album={albums[displayedAlbumId]}
-									displayedAlbumId={displayedAlbumId}
-								/>
-								<div
-									className={
-										'flex flex-row items-center justify-between py-4'
-									}
-								>
-									<IoArrowBack
-										size={48}
-										className="cursor-pointer"
-										onClick={() => handlePrevNext('prev')}
-									/>
-									<IoArrowForward
-										size={48}
-										className="cursor-pointer"
-										onClick={() => handlePrevNext('next')}
-									/>
-								</div>
-							</>
-						) : (
-							'No albums to display yet'
-						)}
-					</>
-				) : (
-					'Please log in'
-				)}
-
-				<div className="">
-					{loading ? 'LOADING...' : ''}
-
-					<br />
-					<div>
-						Nb: {albums ? albums.length : 'NULL'} -{' '}
-						{albumFetching ? `Fetching page ${apiPage}...` : 'Done'}
+						<div>Page : {apiPage}</div>
 					</div>
-					<div>Page : {apiPage}</div>
-				</div>
-			</main>
+				</main>
+			</MusicKitProvider>
 		</>
 	)
 }

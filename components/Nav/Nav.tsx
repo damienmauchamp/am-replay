@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import AMLoginButton from '../AMLoginButton/AMLoginButton'
 import classes from './Nav.module.css'
+import withMusicKit from '@/hoc/WithMusicKit'
+import LoginButton from '../Auth/LoginButton/LoginButton'
+import LogoutButton from '../Auth/LogoutButton/LogoutButton'
 
 const DEBUG = true
 
@@ -65,6 +68,22 @@ export const Nav = (props: {
 		setLogged(false)
 	}
 
+	useEffect(() => {
+		log('(useEffect) MusicKit.getInstance():', MusicKit.getInstance(), {
+			Authorization: `Bearer ${MusicKit.getInstance().developerToken}`,
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			'Music-User-Token': MusicKit.getInstance().musicUserToken,
+		})
+
+		// MusicKit.getInstance().addEventListener(
+		// 	MusicKit.Events.authorizationStatusDidChange,
+		// 	(e: any) => {
+		// 		console.log('MusicKit.Events.authorizationStatusDidChange', e)
+		// 	}
+		// )
+	})
+
 	/**
 	 * Updating logged
 	 */
@@ -111,9 +130,12 @@ export const Nav = (props: {
 	return (
 		<>
 			<nav className={classes.nav}>
-				<AMLoginButton musicKit={musicKit} onLogin={handleLogin} />
+				<LoginButton onLogin={handleLogin} />
+				<LogoutButton onLogout={handleLogout} />
 
-				{logged ? <button onClick={handleLogout}>Logout</button> : ''}
+				{/* <div>||| OLD : </div>
+				<AMLoginButton musicKit={musicKit} onLogin={handleLogin} />
+				{logged ? <button onClick={handleLogout}>Logout</button> : ''} */}
 			</nav>
 
 			{debug()}

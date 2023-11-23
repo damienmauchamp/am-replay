@@ -1,37 +1,24 @@
 import { useEffect, useState } from 'react'
-import classes from './AMLoginButton.module.css'
+import classes from './LoginButton.module.css'
+import withMusicKit from '@/hoc/WithMusicKit'
 
-const log = (...args: any) => {
-	console.log('%c[AMLoginButton]', 'color:red', ...args)
+interface LoginButtonProps extends WithMusicKitProps {
+	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
 }
 
-const AMLoginButton = (props: {
-	musicKit: MusicKit.MusicKitInstance
-	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
-}) => {
+const log = (...args: any) => {
+	console.log('%c[LoginButton]', 'color:pink', ...args)
+}
+
+const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 	const [loading, setLoading] = useState<boolean>(true)
 	const [isLogging, setIsLogging] = useState<boolean>(false)
 	const [logged, setLogged] = useState<boolean>(
-		props.musicKit?.isAuthorized || false
+		props.mk?.isAuthorized || false
 	)
 
-	log('logged:', logged)
-	log('render:', {
-		loading: loading,
-		isLogging: isLogging,
-		logged: logged,
-		'props.musicKit': props.musicKit,
-		'props.onLogin': props.onLogin,
-	})
-
-	/**
-	 * Login
-	 */
 	const handleLogin = () => {
-		log(
-			'(handleLogin) props.musicKit?.isAuthorized',
-			props.musicKit?.isAuthorized
-		)
+		log('(handleLogin) props.mk?.isAuthorized', props.mk?.isAuthorized)
 
 		if (logged) {
 			// Already logged
@@ -42,13 +29,14 @@ const AMLoginButton = (props: {
 		setIsLogging(true)
 
 		//
-		return props.musicKit
+		return props.mk
 			.authorize()
 			.then((response: any) => {
 				log('(handleLogin) authorized reponse:', response)
 
 				// updating musicKit
-				props.onLogin(props.musicKit)
+				// todo : see if needed
+				props.onLogin(props.mk)
 
 				setIsLogging(false)
 				setLogged(true)
@@ -58,7 +46,8 @@ const AMLoginButton = (props: {
 				console.error(err)
 
 				// updating musicKit
-				props.onLogin(props.musicKit)
+				// todo : see if needed
+				props.onLogin(props.mk)
 
 				setIsLogging(false)
 			})
@@ -68,10 +57,6 @@ const AMLoginButton = (props: {
 		log('(useEffect[])', logged)
 		log('(useEffect[]) MusicKit:', MusicKit)
 		log('(useEffect[]) MusicKit.getInstance():', MusicKit.getInstance())
-		// console.log('useEffect[]: ', {
-		// 	'props.musicKit?.isAuthorized': props.musicKit?.isAuthorized,
-		// })
-		// setLogged(props.musicKit?.isAuthorized);
 
 		setTimeout(() => {
 			setLoading(false)
@@ -79,21 +64,23 @@ const AMLoginButton = (props: {
 	}, [])
 
 	useEffect(() => {
-		log(
-			'useEffect[props.musicKit?.isAuthorized]:',
-			props.musicKit?.isAuthorized
-		)
-		setLogged(props.musicKit?.isAuthorized)
-	}, [props.musicKit?.isAuthorized])
+		log('useEffect[props.isAuthorized]:', props.isAuthorized)
+		log('useEffect[props.mk.isAuthorized]:', props.mk.isAuthorized)
+		setLogged(props.mk.isAuthorized)
+	}, [props.mk.isAuthorized])
 
 	return (
 		<>
 			{loading ? (
-				<div>LOADING...</div>
+				<div>loading...</div>
 			) : (
 				<button
 					className={
-						logged ? classes.buttonBgConnected : classes.buttonBg
+						logged
+							? classes.buttonBgConnected
+							: isLogging
+							  ? classes.buttonBgLogging
+							  : classes.buttonBg
 					}
 					onClick={handleLogin}
 				>
@@ -104,4 +91,4 @@ const AMLoginButton = (props: {
 	)
 }
 
-export default AMLoginButton
+export default withMusicKit(LoginButton)

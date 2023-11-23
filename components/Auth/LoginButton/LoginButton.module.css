@@ -1,0 +1,9 @@
+.buttonBg {
+	background: red;
+}
+.buttonBgConnected {
+	background: green;
+}
+.buttonBgLogging {
+	background: purple;
+}
