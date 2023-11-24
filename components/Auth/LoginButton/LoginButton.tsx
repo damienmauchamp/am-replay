@@ -99,3 +99,4 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 }
 
 export default withMusicKit(LoginButton)
+// export const LoginButtonComponent = LoginButton
