@@ -246,19 +246,20 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 	const resetPage = () => {
 		stopLoading()
 		setAlbums([])
+		setDisplayedAlbumId(0)
 		setApiPage(1)
 	}
 
 	return (
 		<>
 			<MusicKitProvider>
-				<MyComponent test={'OUIIII'} />
-
 				<Nav
 					musicKit={musicKit}
 					onLogin={handleLogin}
 					onLogout={handleLogout}
 				/>
+
+				<MyComponent test={'OUIIII'} />
 
 				<main
 					className={`flex min-h-screen flex-col items-center p-12 ${inter.className}`}

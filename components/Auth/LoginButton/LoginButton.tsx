@@ -57,6 +57,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 		log('(useEffect[])', logged)
 		log('(useEffect[]) MusicKit:', MusicKit)
 		log('(useEffect[]) MusicKit.getInstance():', MusicKit.getInstance())
+		log('(useEffect[]) props.testMethod():', props.testMethod())
 
 		setTimeout(() => {
 			setLoading(false)
@@ -69,8 +70,14 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 		setLogged(props.mk.isAuthorized)
 	}, [props.mk.isAuthorized])
 
+	// todo : tests
+	const handleTestMethod = () => {
+		props.testMethod()
+	}
+
 	return (
 		<>
+			<button onClick={handleTestMethod}>testMethod()</button>
 			{loading ? (
 				<div>loading...</div>
 			) : (

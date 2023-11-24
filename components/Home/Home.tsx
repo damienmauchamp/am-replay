@@ -1,10 +1,6 @@
 import AlbumPicker from '../AlbumPicker/AlbumPicker'
 
-export const Home = (props: {
-	musicKit: MusicKit.MusicKitInstance
-	// updateMusicKit: Function,
-	// handleLogout: Function,
-}) => {
+export const Home = (props: { musicKit: MusicKit.MusicKitInstance }) => {
 	console.log('Home')
 
 	return (

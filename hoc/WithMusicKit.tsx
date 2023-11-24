@@ -83,11 +83,17 @@ const withMusicKit = <T extends object>(
 			console.log(`Component ${WrappedComponent.name} updated.`)
 		})
 
+		// todo : tests
+		const testMethod = () => {
+			console.log(`testMethod ${WrappedComponent.name}.`)
+		}
+
 		return (
 			<WrappedComponent
 				{...(props as T)}
 				mk={mkInstance}
 				isAuthorized={isAuthorized}
+				testMethod={testMethod}
 			/>
 		)
 	}
