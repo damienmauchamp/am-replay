@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import classes from './LoginButton.module.css'
 import withMusicKit from '@/hoc/WithMusicKit'
+import Button from '@/components/AM/Button'
 
 interface LoginButtonProps extends WithMusicKitProps {
 	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
@@ -81,7 +82,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 			{loading ? (
 				<div>loading...</div>
 			) : (
-				<button
+				<Button
 					className={
 						logged
 							? classes.buttonBgConnected
@@ -92,7 +93,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 					onClick={handleLogin}
 				>
 					{logged ? 'Logged' : isLogging ? 'Logging in' : 'Login'}
-				</button>
+				</Button>
 			)}
 		</>
 	)

@@ -1,0 +1,123 @@
+.button {
+	/* @apply w-[66px] h-7; */
+	@apply justify-center items-center inline-flex;
+	@apply w-fit;
+	/* @apply bg-blue-600; */
+
+	/* Size */
+	@apply gap-1;
+	@apply px-2.5 py-1; /* default */
+
+	/* Style */
+	@apply rounded-[40px];
+
+	/* */
+	/* @apply hover:brightness-95; */
+}
+
+.button:not(.buttonStateDisabled) {
+	@apply active:opacity-75;
+	@apply active:dark:brightness-75 active:dark:opacity-100;
+}
+
+.button > div {
+	@apply text-[15px] font-normal leading-tight;
+	@apply font-['SFPro'];
+	/* @apply font-['SFProText-Regular']; */
+}
+
+.buttonBorderless > div,
+.buttonBelezedGray > div,
+.buttonBelezed > div {
+	@apply text-buttonColor;
+}
+
+.buttonIcon {
+	@apply text-center;
+}
+
+.buttonLabel {
+}
+
+/* Size */
+.buttonSmall {
+	@apply px-2.5 py-1;
+	@apply gap-[3px];
+
+	@apply h-7;
+}
+.buttonMedium {
+	@apply px-3.5 py-[7px];
+
+	@apply h-[34px];
+}
+.buttonLarge {
+	@apply px-5 py-3.5;
+	@apply rounded-xl;
+
+	@apply h-[50px];
+}
+
+/* LabelType */
+.buttonText {
+}
+.buttonSymbolText {
+}
+.buttonSymbol.buttonSmall {
+	@apply w-7;
+}
+.buttonSymbol.buttonMedium {
+	@apply w-[34px];
+}
+.buttonSymbol.buttonLarge {
+	@apply w-[50px];
+	@apply rounded-full;
+}
+
+/* Style */
+.buttonBorderless {
+	@apply bg-transparent;
+}
+.buttonBelezedGray {
+	@apply bg-zinc-500 bg-opacity-10;
+}
+.buttonBelezed {
+	/* @apply bg-blue-600; */
+	@apply bg-buttonColor;
+	@apply bg-opacity-20;
+}
+.buttonFilled:not(.buttonStateDisabled) {
+	/* @apply bg-blue-600; */
+	@apply bg-buttonColor;
+}
+.buttonFilled:not(.buttonStateDisabled) > div {
+	@apply text-white;
+}
+
+/* State */
+.buttonStateEnabled {
+}
+
+.buttonStateDisabled {
+	/* @apply bg-opacity-10; */
+	@apply cursor-default;
+}
+
+.buttonStateDisabled > div {
+	/* @apply bg-opacity-10; */
+	@apply text-zinc-700 text-opacity-30;
+}
+
+/* OnMaterialState */
+.buttonOnMaterialStateOn {
+	/* @apply bg-white; */
+}
+.buttonStateDisabled.buttonOnMaterialStateOn:not(.buttonBorderless) {
+	@apply bg-white bg-opacity-20;
+}
+
+.buttonOnMaterialStateOff {
+	/* @apply bg-zinc-500; */
+}
+
+/* LabelType */
