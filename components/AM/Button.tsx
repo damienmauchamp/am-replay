@@ -56,7 +56,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 	// icon?: IconType
 	Icon?: React.ElementType
-	theme?: string
 
 	// Large/Play sans icone
 	// Mode: Light
@@ -78,9 +77,6 @@ const defaultProps: ButtonProps = {
 	State: true,
 	OnMaterialState: false,
 	LabelType: ButtonLabelType.Text,
-	// theme: 'pink',
-	// theme: '',
-	// textStyle:
 }
 
 const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
@@ -125,8 +121,6 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 				${classes['button' + props.LabelType]}
 				${classes['buttonState' + (props.State ? 'Enabled' : 'Disabled')]}
 				${classes['buttonOnMaterialState' + (props.OnMaterialState ? 'On' : 'Off')]}
-				${props.theme ? classes[props.theme] : ''}
-				${props.theme ? `theme${capitalized(props.theme)}` : ''}
 				`}
 				onClick={handleClick}
 				data-Size={props.Size}

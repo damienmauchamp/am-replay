@@ -329,7 +329,7 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 					onLogout={handleLogout}
 				/>
 
-				<Button Style="Filled" className="w-[50px]" theme="pink">
+				<Button Style="Filled" className="w-[50px]">
 					Coucou
 				</Button>
 
@@ -337,7 +337,6 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 					Size="Medium"
 					Style="Filled"
 					className="w-[50px]"
-					theme="pink"
 					style={{
 						backgroundColor: 'green',
 					}}

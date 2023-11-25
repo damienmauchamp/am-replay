@@ -104,8 +104,8 @@ const iOSTheme = {
 /**
  * Theme colors
  */
-// const primaryColor = iOSTheme.color.blue
-const primaryColor = iOSTheme.color.pink
+const primaryColor = iOSTheme.color.blue
+// const primaryColor = iOSTheme.color.pink
 
 const config: Config = {
 	content: [
