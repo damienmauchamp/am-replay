@@ -22,8 +22,7 @@
 
 .button > div {
 	@apply text-[15px] font-normal leading-tight;
-	@apply font-['SFPro'];
-	/* @apply font-['SFProText-Regular']; */
+	font-family: 'SF Pro';
 }
 
 .buttonBorderless > div,

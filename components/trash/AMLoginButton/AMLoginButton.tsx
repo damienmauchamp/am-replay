@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import classes from './AMLoginButton.module.css'
+import { logDebug } from '@/helpers/debug'
 
 const log = (...args: any) => {
-	console.log('%c[AMLoginButton]', 'color:red', ...args)
+	logDebug('AMLoginButton', 'red', ...args)
 }
 
 const AMLoginButton = (props: {
@@ -68,7 +69,7 @@ const AMLoginButton = (props: {
 		log('(useEffect[])', logged)
 		log('(useEffect[]) MusicKit:', MusicKit)
 		log('(useEffect[]) MusicKit.getInstance():', MusicKit.getInstance())
-		// console.log('useEffect[]: ', {
+		// log('useEffect[]: ', {
 		// 	'props.musicKit?.isAuthorized': props.musicKit?.isAuthorized,
 		// })
 		// setLogged(props.musicKit?.isAuthorized);

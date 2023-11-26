@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import classes from './LoginButton.module.css'
 import withMusicKit from '@/hoc/WithMusicKit'
-import Button from '@/components/AM/Button'
+import Button from '@/components/AppleMusic/Buttons/Button'
 import { IoLogInOutline } from 'react-icons/io5'
+import { logDebug } from '@/helpers/debug'
 
 interface LoginButtonProps extends WithMusicKitProps {
 	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
 }
 
 const log = (...args: any) => {
-	console.log('%c[LoginButton]', 'color:pink', ...args)
+	logDebug('LoginButton', 'pink', ...args)
 }
 
 const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
@@ -72,14 +73,8 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 		setLogged(props.mk.isAuthorized)
 	}, [props.mk.isAuthorized])
 
-	// todo : tests
-	const handleTestMethod = () => {
-		props.testMethod()
-	}
-
 	return (
 		<>
-			<button onClick={handleTestMethod}>testMethod()</button>
 			{loading ? (
 				<div>loading...</div>
 			) : (
@@ -97,6 +92,15 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 					{logged ? 'Logged' : isLogging ? 'Logging in' : 'Login'}
 				</Button>
 			)}
+
+			{/* debug */}
+			<button
+				onClick={() => {
+					props.testMethod()
+				}}
+			>
+				testMethod()
+			</button>
 		</>
 	)
 }

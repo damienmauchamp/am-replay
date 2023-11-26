@@ -62,7 +62,18 @@ const defaultProps: ButtonProps = {
 	// LabelType: ButtonLabelType.Text,
 }
 
-const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
+const Button = ({
+	children,
+	Icon,
+	State,
+	OnMaterialState,
+	LabelType,
+	Color,
+	textStyle,
+	iconStyle,
+	ref,
+	...props
+}: ButtonProps) => {
 	const debug = () => {
 		console.log('[Button] debug:', {
 			Size: props.Size,
@@ -70,8 +81,8 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 		})
 	}
 
-	if (!props.LabelType && Icon) {
-		props.LabelType = children
+	if (!LabelType && Icon) {
+		LabelType = children
 			? ButtonLabelType.SymbolText
 			: ButtonLabelType.Symbol
 	}
@@ -86,20 +97,20 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 	const buttonStyle = () => {
 		let style = {}
 
-		if (props.Color) {
-			if (props.Style === ButtonStyle.Bezeled && props.State) {
+		if (Color) {
+			if (props.Style === ButtonStyle.Bezeled && State) {
 				style = {
 					...style,
 					backgroundColor: `rgba(${colorToRgbString(
-						props.Color
+						Color
 					)} / var(--tw-bg-opacity))`,
 				}
 			}
 
-			if (props.Style === ButtonStyle.Filled && props.State) {
+			if (props.Style === ButtonStyle.Filled && State) {
 				style = {
 					...style,
-					backgroundColor: props.Color,
+					backgroundColor: Color,
 				}
 			}
 		}
@@ -110,10 +121,10 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 	const buttonElementsStyle = () => {
 		let style = {}
 
-		if (props.Color && props.State && props.Style !== ButtonStyle.Filled) {
+		if (Color && State && props.Style !== ButtonStyle.Filled) {
 			style = {
 				...style,
-				color: props.Color,
+				color: Color,
 			}
 		}
 
@@ -130,24 +141,19 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 				${classes.button} 
 				${classes['button' + props.Size]}
 				${classes['button' + props.Style]}
-				${classes['button' + props.LabelType]}
-				${classes['buttonState' + (props.State ? 'Enabled' : 'Disabled')]}
-				${classes['buttonOnMaterialState' + (props.OnMaterialState ? 'On' : 'Off')]}
+				${classes['button' + LabelType]}
+				${classes['buttonState' + (State ? 'Enabled' : 'Disabled')]}
+				${classes['buttonOnMaterialState' + (OnMaterialState ? 'On' : 'Off')]}
 				`}
 				onClick={handleClick}
-				data-Size={props.Size}
-				data-Style={props.Style}
-				data-LabelType={props.LabelType}
-				data-State={props.State}
-				data-OnMaterialState={props.OnMaterialState}
 				style={{ ...props.style, ...buttonStyle() }}
 			>
-				{props.LabelType !== ButtonLabelType.Text && Icon ? (
+				{LabelType !== ButtonLabelType.Text && Icon ? (
 					<>
 						<div
 							className="buttonIcon"
 							style={{
-								...props.iconStyle,
+								...iconStyle,
 								...buttonElementsStyle(),
 							}}
 						>
@@ -157,12 +163,12 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 				) : (
 					''
 				)}
-				{props.LabelType !== ButtonLabelType.Symbol ? (
+				{LabelType !== ButtonLabelType.Symbol ? (
 					<div
 						className="buttonLabel"
 						style={{
 							...buttonElementsStyle(),
-							...props.textStyle,
+							...textStyle,
 						}}
 					>
 						{children}

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import Button from '@/components/AM/Button'
+import Button from '@/components/AppleMusic/Buttons/Button'
 import { IoPlaySharp } from 'react-icons/io5'
 
 const meta = {

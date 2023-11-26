@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
-import AMLoginButton from '../AMLoginButton/AMLoginButton'
 import classes from './Nav.module.css'
-import withMusicKit from '@/hoc/WithMusicKit'
 import LoginButton from '../Auth/LoginButton/LoginButton'
 import LogoutButton from '../Auth/LogoutButton/LogoutButton'
-
-const DEBUG = true
+import { logDebug } from '@/helpers/debug'
 
 const log = (...args: any) => {
-	console.log('%c[Nav]', 'color:green', ...args)
+	logDebug('Nav', 'green', ...args)
 }
+
+const DEBUG = true
 
 export const Nav = (props: {
 	musicKit: MusicKit.MusicKitInstance
@@ -132,13 +131,9 @@ export const Nav = (props: {
 			<nav className={classes.nav}>
 				<LoginButton onLogin={handleLogin} />
 				<LogoutButton onLogout={handleLogout} />
-
-				{/* <div>||| OLD : </div>
-				<AMLoginButton musicKit={musicKit} onLogin={handleLogin} />
-				{logged ? <button onClick={handleLogout}>Logout</button> : ''} */}
 			</nav>
 
-			{debug()}
+			{/* {debug()} */}
 		</>
 	)
 }

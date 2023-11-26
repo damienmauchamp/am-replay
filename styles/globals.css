@@ -24,78 +24,83 @@ body {
 			rgb(var(--background-end-rgb))
 		)
 		rgb(var(--background-start-rgb));
-	font-family: 'SFPro';
+	font-family:
+		SF Pro,
+		Helvetica Neue,
+		Helvetica,
+		Arial,
+		sans-serif;
 }
 
 /* SF Pro */
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 300;
 	font-style: 'italic';
 	src: url('../public/assets/fonts/SFPro/SFProText-LightItalic.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 300;
 	font-style: normal;
 	src: url('../public/assets/fonts/SFPro/SFProText-Light.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 400;
 	font-style: 'italic';
 	src: url('../public/assets/fonts/SFPro/SFProText-RegularItalic.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 400;
 	font-style: normal;
 	src: url('../public/assets/fonts/SFPro/SFProText-Regular.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 500;
 	font-style: 'italic';
 	src: url('../public/assets/fonts/SFPro/SFProText-MediumItalic.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 500;
 	font-style: normal;
 	src: url('../public/assets/fonts/SFPro/SFProText-Medium.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 600;
 	font-style: 'italic';
 	src: url('../public/assets/fonts/SFPro/SFProText-SemiboldItalic.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 600;
 	font-style: normal;
 	src: url('../public/assets/fonts/SFPro/SFProText-Semibold.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 700;
 	font-style: 'italic';
 	src: url('../public/assets/fonts/SFPro/SFProText-BoldItalic.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 700;
 	font-style: normal;
 	src: url('../public/assets/fonts/SFPro/SFProText-Bold.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 900;
 	font-style: 'italic';
 	src: url('../public/assets/fonts/SFPro/SFProText-HeavyItalic.ttf');
 }
 @font-face {
-	font-family: 'SFPro';
+	font-family: 'SF Pro';
 	font-weight: 900;
 	font-style: normal;
 	src: url('../public/assets/fonts/SFPro/SFProText-Heavy.ttf');

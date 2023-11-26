@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
 import classes from './LogoutButton.module.css'
 import withMusicKit from '@/hoc/WithMusicKit'
-import Button from '@/components/AM/Button'
+import Button from '@/components/AppleMusic/Buttons/Button'
 import { IoLogOut, IoLogOutOutline } from 'react-icons/io5'
+import { logDebug } from '@/helpers/debug'
+
+const log = (...args: any) => {
+	logDebug('LogoutButton', 'purple', ...args)
+}
 
 interface LogoutButtonProps extends WithMusicKitProps {
 	onLogout: () => void
 }
-
-const log = (...args: any) => {
-	console.log('%c[LogoutButton]', 'color:purple', ...args)
-}
-
 const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
 	const [logged, setLogged] = useState<boolean>(
 		props.isAuthorized // props.mk?.isAuthorized || false

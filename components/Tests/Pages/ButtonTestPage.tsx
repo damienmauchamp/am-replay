@@ -1,6 +1,6 @@
 import React from 'react'
 import { IoPauseSharp, IoPlaySharp } from 'react-icons/io5'
-import Button from '../AM/Button'
+import Button from '../../AppleMusic/Buttons/Button'
 
 export default function ButtonTestPage() {
 	const testButtonsProps = {
