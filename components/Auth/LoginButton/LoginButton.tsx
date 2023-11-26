@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import classes from './LoginButton.module.css'
 import withMusicKit from '@/hoc/WithMusicKit'
 import Button from '@/components/AM/Button'
+import { IoLogInOutline } from 'react-icons/io5'
 
 interface LoginButtonProps extends WithMusicKitProps {
 	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
@@ -91,6 +92,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 							  : classes.buttonBg
 					}
 					onClick={handleLogin}
+					Icon={logged ? null : IoLogInOutline}
 				>
 					{logged ? 'Logged' : isLogging ? 'Logging in' : 'Login'}
 				</Button>

@@ -1,19 +1,6 @@
+import { colorToRgbString, colorToRgbaString } from '@/helpers/colors'
 import classes from './Button.module.css'
-import React, {
-	forwardRef,
-	ForwardedRef,
-	ReactElement,
-	HTMLProps,
-	ButtonHTMLAttributes,
-	useRef,
-	ReactNode,
-	CSSProperties,
-} from 'react'
-import { IconType } from 'react-icons'
-
-import { IoPlaySharp } from 'react-icons/io5'
-import { Style } from 'util'
-// import io, { IoPlaySharp } from 'react-icons/io5'
+import React, { ButtonHTMLAttributes, ReactNode, CSSProperties } from 'react'
 
 enum ButtonSize {
 	Large = 'Large',
@@ -27,15 +14,6 @@ enum ButtonStyle {
 	Bezeled = 'Bezeled',
 	Filled = 'Filled',
 }
-
-// enum ButtonState {
-// 	Enabled = true,
-// 	Disabled = false,
-// }
-
-// enum OnMaterialState {
-
-// }
 
 enum ButtonLabelType {
 	Symbol = 'Symbol',
@@ -67,16 +45,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	// Label: string (Play)
 
 	//
+	Color?: string
 	textStyle?: CSSProperties
 	iconStyle?: CSSProperties
 }
 
 const defaultProps: ButtonProps = {
-	// Size: ButtonSize.Large,
-	// Style: ButtonStyle.Filled,
 	State: true,
 	OnMaterialState: false,
-	LabelType: ButtonLabelType.Text,
+	// LabelType: ButtonLabelType.Text,
 }
 
 const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
@@ -87,14 +64,11 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 		})
 	}
 
-	// // defining LabelType
-	// if (Icon && children) {
-	// 	props.LabelType = ButtonLabelType.SymbolText
-	// } else if (Icon) {
-	// 	props.LabelType = ButtonLabelType.Symbol
-	// } else {
-	// 	props.LabelType = ButtonLabelType.Text
-	// }
+	if (!props.LabelType && Icon) {
+		props.LabelType = children
+			? ButtonLabelType.SymbolText
+			: ButtonLabelType.Symbol
+	}
 
 	const handleClick = (e: any) => {
 		if (props.onClick) {
@@ -103,10 +77,42 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 		debug()
 	}
 
-	const capitalized = (word: string) =>
-		word.charAt(0).toUpperCase() + word.slice(1)
+	const buttonStyle = () => {
+		let style = {}
 
-	console.log('props.className', props.className)
+		if (props.Color) {
+			if (props.Style === ButtonStyle.Bezeled && props.State) {
+				style = {
+					...style,
+					backgroundColor: `rgba(${colorToRgbString(
+						props.Color
+					)} / var(--tw-bg-opacity))`,
+				}
+			}
+
+			if (props.Style === ButtonStyle.Filled && props.State) {
+				style = {
+					...style,
+					backgroundColor: props.Color,
+				}
+			}
+		}
+
+		return style
+	}
+
+	const buttonElementsStyle = () => {
+		let style = {}
+
+		if (props.Color && props.State && props.Style !== ButtonStyle.Filled) {
+			style = {
+				...style,
+				color: props.Color,
+			}
+		}
+
+		return style
+	}
 
 	return (
 		<>
@@ -128,10 +134,17 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 				data-LabelType={props.LabelType}
 				data-State={props.State}
 				data-OnMaterialState={props.OnMaterialState}
+				style={{ ...props.style, ...buttonStyle() }}
 			>
 				{props.LabelType !== ButtonLabelType.Text && Icon ? (
 					<>
-						<div className="buttonIcon" style={props.iconStyle}>
+						<div
+							className="buttonIcon"
+							style={{
+								...props.iconStyle,
+								...buttonElementsStyle(),
+							}}
+						>
 							<Icon />
 						</div>
 					</>
@@ -139,22 +152,19 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 					''
 				)}
 				{props.LabelType !== ButtonLabelType.Symbol ? (
-					<div className="buttonLabel" style={props.textStyle}>
+					<div
+						className="buttonLabel"
+						style={{
+							...buttonElementsStyle(),
+							...props.textStyle,
+						}}
+					>
 						{children}
 					</div>
 				) : (
 					''
 				)}
 			</button>
-
-			{/* <div class="w-[66px] h-7 px-2.5 py-1 bg-blue-600 bg-opacity-20 rounded-[40px] justify-center items-center gap-[3px] inline-flex">
-				<div class="text-center text-blue-600 text-[15px] font-normal font-['SF Pro'] leading-tight">
-					􀊄
-				</div>
-				<div class="text-blue-600 text-[15px] font-normal font-['SF Pro'] leading-tight">
-					Play
-				</div>
-			</div> */}
 		</>
 	)
 }

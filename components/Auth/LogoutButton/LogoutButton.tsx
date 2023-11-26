@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import classes from './LogoutButton.module.css'
 import withMusicKit from '@/hoc/WithMusicKit'
+import Button from '@/components/AM/Button'
+import { IoLogOut, IoLogOutOutline } from 'react-icons/io5'
 
 interface LogoutButtonProps extends WithMusicKitProps {
 	onLogout: () => void
@@ -39,7 +41,22 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
 		setLogged(props.mk.isAuthorized)
 	}, [props.mk.isAuthorized])
 
-	return <>{logged ? <button onClick={handleLogout}>Logout</button> : ''}</>
+	return (
+		<>
+			{logged ? (
+				<Button
+					onClick={handleLogout}
+					Color="#FF2D55"
+					Style="Filled"
+					Icon={IoLogOutOutline}
+				>
+					Logout
+				</Button>
+			) : (
+				''
+			)}
+		</>
+	)
 }
 
 export default withMusicKit(LogoutButton)

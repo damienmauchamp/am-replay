@@ -27,8 +27,8 @@
 }
 
 .buttonBorderless > div,
-.buttonBelezedGray > div,
-.buttonBelezed > div {
+.buttonBezeledGray > div,
+.buttonBezeled > div {
 	@apply text-buttonColor;
 }
 
@@ -78,10 +78,11 @@
 .buttonBorderless {
 	@apply bg-transparent;
 }
-.buttonBelezedGray {
+.buttonBezeledGray,
+.buttonBezeled.buttonStateDisabled {
 	@apply bg-zinc-500 bg-opacity-10;
 }
-.buttonBelezed {
+.buttonBezeled {
 	/* @apply bg-blue-600; */
 	@apply bg-buttonColor;
 	@apply bg-opacity-20;
@@ -119,5 +120,3 @@
 .buttonOnMaterialStateOff {
 	/* @apply bg-zinc-500; */
 }
-
-/* LabelType */

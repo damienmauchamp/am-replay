@@ -16,6 +16,7 @@ import { Home } from '@/components/Home/Home'
 import MusicKitProvider from '@/components/Providers/MusicKitProvider'
 import MyComponent from '@/components/Tests/MyComponent'
 import Button from '@/components/AM/Button'
+import ButtonTestPage from '@/components/TestPages/ButtonTestPage'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -257,69 +258,6 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 		setApiPage(1)
 	}
 
-	const testButtonsType = [
-		{
-			Style: 'Borderless',
-			Icon: IoPlaySharp,
-		},
-		{
-			Style: 'BelezedGray',
-			Icon: IoPlaySharp,
-		},
-		{
-			Style: 'Belezed',
-			Icon: IoPlaySharp,
-		},
-		{
-			Style: 'Filled',
-			Icon: IoPlaySharp,
-		},
-	]
-
-	const testButtons = () => {
-		let buttons: any[] = []
-
-		let labelTypeButtons: any[] = []
-		testButtonsType.forEach((button) => {
-			labelTypeButtons = [
-				...labelTypeButtons,
-				{
-					...button,
-					LabelType: 'SymbolText',
-				},
-				{
-					...button,
-					LabelType: 'Symbol',
-				},
-				{
-					...button,
-					LabelType: 'Text',
-				},
-			]
-		})
-		// return labelTypeButtons
-
-		let sizeButtons: any[] = []
-		labelTypeButtons.forEach((button) => {
-			sizeButtons = [
-				...sizeButtons,
-				{
-					...button,
-					Size: 'Small',
-				},
-				{
-					...button,
-					Size: 'Medium',
-				},
-				{
-					...button,
-					Size: 'Large',
-				},
-			]
-		})
-		return sizeButtons
-	}
-
 	return (
 		<>
 			<MusicKitProvider>
@@ -329,77 +267,7 @@ const Landing: NextPage<{ libraryAlbums: LibraryAlbum[] }> = ({
 					onLogout={handleLogout}
 				/>
 
-				<Button Style="Filled" className="w-[50px]">
-					Coucou
-				</Button>
-
-				<Button
-					Size="Medium"
-					Style="Filled"
-					className="w-[50px]"
-					style={{
-						backgroundColor: 'green',
-					}}
-					textStyle={{
-						color: 'red',
-					}}
-					iconStyle={{
-						color: 'yellow',
-						// fontSize: 50,
-					}}
-					LabelType="TextSymbol"
-					Icon={IoPauseSharp}
-				>
-					Pause
-				</Button>
-
-				<div className={'grid grid-cols-3 gap-2 p-4 bg-[#ccc]'}>
-					{testButtons().map((buttonType) => {
-						const newCollection = [
-							{
-								...buttonType,
-								OnMaterialState: false,
-								State: true,
-							},
-							{
-								...buttonType,
-								OnMaterialState: true,
-								State: true,
-							},
-							{
-								...buttonType,
-								OnMaterialState: false,
-								State: false,
-							},
-							{
-								...buttonType,
-								OnMaterialState: true,
-								State: false,
-							},
-						]
-
-						return (
-							<div className="grid grid-cols-2 grid-rows-2 border-2 p-2">
-								{newCollection.map((button) => {
-									return (
-										<Button
-											Size={button.Size}
-											Style={button.Style}
-											State={button.State}
-											OnMaterialState={
-												button.OnMaterialState
-											}
-											Icon={button.Icon}
-											LabelType={button.LabelType}
-										>
-											Play
-										</Button>
-									)
-								})}
-							</div>
-						)
-					})}
-				</div>
+				<ButtonTestPage />
 
 				<MyComponent test={'OUIIII'} />
 
