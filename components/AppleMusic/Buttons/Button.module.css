@@ -79,7 +79,9 @@
 }
 .buttonBezeledGray,
 .buttonBezeled.buttonStateDisabled {
-	@apply bg-zinc-500 bg-opacity-10;
+	/* .buttonBezeled:disabled { */
+	@apply bg-zinc-500;
+	@apply bg-opacity-10 dark:bg-opacity-25;
 }
 .buttonBezeled {
 	/* @apply bg-blue-600; */
@@ -87,25 +89,29 @@
 	@apply bg-opacity-20;
 }
 .buttonFilled:not(.buttonStateDisabled) {
+	/* .buttonFilled:not(:disabled) { */
 	/* @apply bg-blue-600; */
 	@apply bg-buttonColor;
 }
 .buttonFilled:not(.buttonStateDisabled) > div {
+	/* .buttonFilled:not(:disabled) > div { */
 	@apply text-white;
 }
 
 /* State */
-.buttonStateEnabled {
-}
 
 .buttonStateDisabled {
+	/* .button:disabled { */
 	/* @apply bg-opacity-10; */
 	@apply cursor-default;
+	@apply dark:bg-zinc-500 dark:bg-opacity-25;
 }
 
 .buttonStateDisabled > div {
+	/* .button:disabled > div { */
 	/* @apply bg-opacity-10; */
-	@apply text-zinc-700 text-opacity-30;
+	@apply text-zinc-700 dark:text-violet-100;
+	@apply text-opacity-30;
 }
 
 /* OnMaterialState */
@@ -113,7 +119,9 @@
 	/* @apply bg-white; */
 }
 .buttonStateDisabled.buttonOnMaterialStateOn:not(.buttonBorderless) {
+	/* buttonOnMaterialStateOn:not(.buttonBorderless):disabled { */
 	@apply bg-white bg-opacity-20;
+	@apply dark:bg-zinc-500 dark:bg-opacity-25;
 }
 
 .buttonOnMaterialStateOff {

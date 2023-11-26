@@ -77,7 +77,7 @@ export default function ButtonTestPage() {
 
 	return (
 		<>
-			<Button Style="Filled" className="w-[50px]">
+			<Button Style="Filled" className="w-[50px]" key={'coucou'}>
 				Coucou
 			</Button>
 
@@ -100,6 +100,7 @@ export default function ButtonTestPage() {
 				}}
 				// LabelType="TextSymbol"
 				Icon={IoPauseSharp}
+				key={'pause'}
 			>
 				Pause
 			</Button>
@@ -110,22 +111,26 @@ export default function ButtonTestPage() {
 						{
 							...buttonType,
 							OnMaterialState: false,
-							State: true,
+							// State: true,
+							disabled: false,
 						},
 						{
 							...buttonType,
 							OnMaterialState: true,
-							State: true,
+							// State: true,
+							disabled: false,
 						},
 						{
 							...buttonType,
 							OnMaterialState: false,
-							State: false,
+							// State: false,
+							disabled: true,
 						},
 						{
 							...buttonType,
 							OnMaterialState: true,
-							State: false,
+							// State: false,
+							disabled: true,
 						},
 					]
 
@@ -136,7 +141,7 @@ export default function ButtonTestPage() {
 									<Button
 										Size={button.Size}
 										Style={button.Style}
-										State={button.State}
+										disabled={button.disabled}
 										OnMaterialState={button.OnMaterialState}
 										Icon={button.Icon}
 										LabelType={button.LabelType}

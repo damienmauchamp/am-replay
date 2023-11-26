@@ -45,7 +45,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	// Mode: Light
 	Size?: ButtonSize | string
 	Style?: ButtonStyle | string
-	State?: boolean
 	OnMaterialState?: boolean
 	LabelType?: ButtonLabelType | string
 	// Label: string (Play)
@@ -57,7 +56,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const defaultProps: ButtonProps = {
-	State: true,
+	disabled: false,
 	OnMaterialState: false,
 	// LabelType: ButtonLabelType.Text,
 }
@@ -65,7 +64,6 @@ const defaultProps: ButtonProps = {
 const Button = ({
 	children,
 	Icon,
-	State,
 	OnMaterialState,
 	LabelType,
 	Color,
@@ -98,7 +96,7 @@ const Button = ({
 		let style = {}
 
 		if (Color) {
-			if (props.Style === ButtonStyle.Bezeled && State) {
+			if (props.Style === ButtonStyle.Bezeled && !props.disabled) {
 				style = {
 					...style,
 					backgroundColor: `rgba(${colorToRgbString(
@@ -107,7 +105,7 @@ const Button = ({
 				}
 			}
 
-			if (props.Style === ButtonStyle.Filled && State) {
+			if (props.Style === ButtonStyle.Filled && !props.disabled) {
 				style = {
 					...style,
 					backgroundColor: Color,
@@ -121,7 +119,7 @@ const Button = ({
 	const buttonElementsStyle = () => {
 		let style = {}
 
-		if (Color && State && props.Style !== ButtonStyle.Filled) {
+		if (Color && !props.disabled && props.Style !== ButtonStyle.Filled) {
 			style = {
 				...style,
 				color: Color,
@@ -142,7 +140,7 @@ const Button = ({
 				${classes['button' + props.Size]}
 				${classes['button' + props.Style]}
 				${classes['button' + LabelType]}
-				${classes['buttonState' + (State ? 'Enabled' : 'Disabled')]}
+				${classes['buttonState' + (!props.disabled ? 'Enabled' : 'Disabled')]}
 				${classes['buttonOnMaterialState' + (OnMaterialState ? 'On' : 'Off')]}
 				`}
 				onClick={handleClick}
