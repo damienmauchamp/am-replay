@@ -1,6 +1,12 @@
 import { colorToRgbString, colorToRgbaString } from '@/helpers/colors'
 import classes from './Button.module.css'
-import React, { ButtonHTMLAttributes, ReactNode, CSSProperties } from 'react'
+import React, {
+	ButtonHTMLAttributes,
+	ReactNode,
+	CSSProperties,
+	ForwardedRef,
+	forwardRef,
+} from 'react'
 
 enum ButtonSize {
 	Large = 'Large',
@@ -171,4 +177,11 @@ const Button = ({ children, Icon, ref, ...props }: ButtonProps) => {
 
 Button.defaultProps = defaultProps
 
-export default Button
+const ButtonWithRef = forwardRef(
+	(props: ButtonProps, ref: ForwardedRef<HTMLButtonElement>) => (
+		<Button {...props} ref={ref} />
+	)
+)
+
+export default ButtonWithRef
+// export default Button
