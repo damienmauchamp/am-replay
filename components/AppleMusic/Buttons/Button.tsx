@@ -83,6 +83,8 @@ const Button = ({
 		LabelType = children
 			? ButtonLabelType.SymbolText
 			: ButtonLabelType.Symbol
+	} else if (!LabelType && children) {
+		LabelType = Icon ? ButtonLabelType.SymbolText : ButtonLabelType.Text
 	}
 
 	const handleClick = (e: any) => {

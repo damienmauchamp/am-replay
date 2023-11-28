@@ -32,6 +32,11 @@ body {
 		sans-serif;
 }
 
+html,
+body {
+	@apply min-h-screen;
+}
+
 /* SF Pro */
 @font-face {
 	font-family: 'SF Pro';

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import Button from '@/components/AppleMusic/Buttons/Button'
 import { IoPlaySharp } from 'react-icons/io5'
+import { testButtons } from '@/helpers/tests/buttonsTests'
 
 const meta = {
 	title: 'AM/Buttons',
@@ -24,65 +25,31 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 //
+const testButton = testButtons().map((testButton) => {
+	return {
+		args: { ...testButton, children: 'Play', Icon: IoPlaySharp },
+	}
+})[0]
 
-export const ButtonA1: Story = {
-	args: {
-		children: 'Play',
-		Size: 'Small',
-		Style: 'Borderless',
-		State: true,
-		OnMaterialState: false,
-		Icon: IoPlaySharp,
-		LabelType: 'SymbolText',
-	},
-}
-export const ButtonA2: Story = {
-	args: {
-		children: 'Play',
-		Size: 'Small',
-		Style: 'Borderless',
-		State: true,
-		OnMaterialState: true,
-		Icon: IoPlaySharp,
-		LabelType: 'SymbolText',
-	},
-}
-export const ButtonA3: Story = {
-	args: {
-		children: 'Play',
-		Size: 'Small',
-		Style: 'Borderless',
-		State: false,
-		OnMaterialState: false,
-		Icon: IoPlaySharp,
-		LabelType: 'SymbolText',
-	},
-}
-export const ButtonA4: Story = {
-	args: {
-		children: 'Play',
-		Size: 'Small',
-		Style: 'Borderless',
-		State: false,
-		OnMaterialState: true,
-		Icon: IoPlaySharp,
-		LabelType: 'SymbolText',
-	},
-}
+export const Default: Story = testButton as Story
 
 export const TextIcon: Story = {
 	args: {
-		children: 'Play',
-		Icon: IoPlaySharp,
+		...testButton.args,
+		LabelType: 'SymbolText',
 	},
 }
 export const TextOnly: Story = {
 	args: {
-		children: 'Play',
+		...testButton.args,
+		Icon: null,
+		LabelType: 'Text',
 	},
 }
 export const IconOnly: Story = {
 	args: {
-		Icon: IoPlaySharp,
+		...testButton.args,
+		children: null,
+		LabelType: 'Symbol',
 	},
 }

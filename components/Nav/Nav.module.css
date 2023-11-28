@@ -6,4 +6,5 @@
 
 .nav {
 	@apply flex-wrap bg-gray-800 justify-center;
+	@apply text-white;
 }

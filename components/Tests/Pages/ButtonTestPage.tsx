@@ -1,80 +1,9 @@
 import React from 'react'
 import { IoPauseSharp, IoPlaySharp } from 'react-icons/io5'
 import Button from '../../AppleMusic/Buttons/Button'
+import { testButtons } from '@/helpers/tests/buttonsTests'
 
 export default function ButtonTestPage() {
-	const testButtonsProps = {
-		Icon: IoPlaySharp,
-		// Color: 'yellow',
-		Color: '#FF2D55',
-		textStyle: {
-			fontWeight: 'bold',
-		} as React.CSSProperties,
-	}
-
-	const testButtonsType = [
-		{
-			...testButtonsProps,
-			Style: 'Borderless',
-		},
-		{
-			...testButtonsProps,
-			Style: 'BezeledGray',
-		},
-		{
-			...testButtonsProps,
-			Style: 'Bezeled',
-		},
-		{
-			...testButtonsProps,
-			Style: 'Filled',
-		},
-	]
-
-	const testButtons = () => {
-		let buttons: any[] = []
-
-		let labelTypeButtons: any[] = []
-		testButtonsType.forEach((button) => {
-			labelTypeButtons = [
-				...labelTypeButtons,
-				{
-					...button,
-					LabelType: 'SymbolText',
-				},
-				{
-					...button,
-					LabelType: 'Symbol',
-				},
-				{
-					...button,
-					LabelType: 'Text',
-				},
-			]
-		})
-		// return labelTypeButtons
-
-		let sizeButtons: any[] = []
-		labelTypeButtons.forEach((button) => {
-			sizeButtons = [
-				...sizeButtons,
-				{
-					...button,
-					Size: 'Small',
-				},
-				{
-					...button,
-					Size: 'Medium',
-				},
-				{
-					...button,
-					Size: 'Large',
-				},
-			]
-		})
-		return sizeButtons
-	}
-
 	return (
 		<>
 			<Button Style="Filled" className="w-[50px]" key={'coucou'}>

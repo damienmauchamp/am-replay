@@ -4,7 +4,7 @@ import ButtonTestPage from '../Tests/Pages/ButtonTestPage'
 export const Home = (props: { musicKit: MusicKit.MusicKitInstance }) => {
 	return (
 		<>
-			<ButtonTestPage />
+			{/* <ButtonTestPage /> */}
 			<AlbumPicker />
 		</>
 	)
