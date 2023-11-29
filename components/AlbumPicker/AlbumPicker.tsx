@@ -13,10 +13,7 @@ interface AlbumPickerProps {}
 
 const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	const { logged, getInstance, isAuthorized } = useMusicKitContext()
-
-	if (!logged) {
-		return 'Please log in'
-	}
+	const [display, setDisplay] = useState<boolean>(false)
 
 	const apiLimit = 100,
 		loopMaxPage = 999
@@ -43,6 +40,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			'loadAlbums',
 			{
 				'isAuthorized()': isAuthorized(),
+				display: display,
 				logged: logged,
 				fetchComplete: fetchComplete,
 				apiPage: apiPage,
@@ -146,26 +144,18 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		setApiPage(1)
 	}
 
-	// debug
 	useEffect(() => {
 		console.log(`Component AlbumPicker mounted.`)
+		log('useEffect[isAuthorized()]:', isAuthorized())
+
+		setDisplay(logged && isAuthorized())
 		return () => {
 			console.log(`Component AlbumPicker unmounted.`)
 		}
 	}, [])
+
 	useEffect(() => {
 		console.log(`Component AlbumPicker updated.`)
-	})
-
-	useEffect(() => {
-		log('useEffect[isAuthorized()]:', isAuthorized())
-
-		if (isAuthorized()) {
-			loadAlbums()
-		}
-	}, [])
-
-	useEffect(() => {
 		log('useEffect[apiPage, loop]:', apiPage, loop)
 
 		if (!loop) {
@@ -192,71 +182,102 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		loadAlbums()
 	}, [apiPage, loop])
 
+	useEffect(() => {
+		log('useEffect[display]:', display)
+		if (display) {
+			loadAlbums()
+		}
+	}, [display])
+
+	useEffect(() => {
+		log('useEffect[logged]:', logged)
+		setDisplay(logged)
+	}, [logged])
+
 	return (
-		<div>
-			<div className="py-4">
-				<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
+		<>
+			{(display && (
+				<>
+					<div className="py-4">
+						<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
 
-				<ul className="flex flex-row gap-2 justify-center py-2">
-					<li>
-						<Button Style="Filled" onClick={() => loadAlbums()}>
-							loadAlbums()
-						</Button>
-					</li>
-					<li>
-						<Button Style="Filled" onClick={() => loadAllAlbums()}>
-							loadAllAlbums()
-						</Button>
-					</li>
-					<li>
-						<Button Style="Filled" onClick={() => stopLoading()}>
-							stopLoading()
-						</Button>
-					</li>
-					<li>
-						<Button Style="Filled" onClick={() => resetPage()}>
-							resetPage()
-						</Button>
-					</li>
-				</ul>
+						<ul className="flex flex-row gap-2 justify-center py-2">
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => loadAlbums()}
+								>
+									loadAlbums()
+								</Button>
+							</li>
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => loadAllAlbums()}
+								>
+									loadAllAlbums()
+								</Button>
+							</li>
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => stopLoading()}
+								>
+									stopLoading()
+								</Button>
+							</li>
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => resetPage()}
+								>
+									resetPage()
+								</Button>
+							</li>
+						</ul>
 
-				{albums.length ? (
-					<>
-						<LibraryAlbum
-							album={albums[displayedAlbumId]}
-							displayedAlbumId={displayedAlbumId}
-						/>
-						<div
-							className={
-								'flex flex-row items-center justify-between py-4'
-							}
-						>
-							<IoArrowBack
-								size={48}
-								className="cursor-pointer"
-								onClick={() => handlePrevNext('prev')}
-							/>
-							<IoArrowForward
-								size={48}
-								className="cursor-pointer"
-								onClick={() => handlePrevNext('next')}
-							/>
+						{albums.length ? (
+							<>
+								<LibraryAlbum
+									album={albums[displayedAlbumId]}
+									displayedAlbumId={displayedAlbumId}
+								/>
+								<div
+									className={
+										'flex flex-row items-center justify-between py-4'
+									}
+								>
+									<IoArrowBack
+										size={48}
+										className="cursor-pointer"
+										onClick={() => handlePrevNext('prev')}
+									/>
+									<IoArrowForward
+										size={48}
+										className="cursor-pointer"
+										onClick={() => handlePrevNext('next')}
+									/>
+								</div>
+							</>
+						) : (
+							'No albums to display yet'
+						)}
+					</div>
+
+					<div className="">
+						<h3>Debug API</h3>
+						<div>
+							Nb: {albums ? albums.length : 'NULL'} -{' '}
+							{albumFetching
+								? `Fetching page ${apiPage}...`
+								: 'Done'}
 						</div>
-					</>
-				) : (
-					'No albums to display yet'
-				)}
-			</div>
-
-			<div className="">
-				<h3>Debug API</h3>
-				<div>
-					Nb: {albums ? albums.length : 'NULL'} -{' '}
-					{albumFetching ? `Fetching page ${apiPage}...` : 'Done'}
-				</div>
-				<div>Page : {apiPage}</div>
-			</div>
-		</div>
+						<div>Page : {apiPage}</div>
+					</div>
+				</>
+			)) ||
+				'Please log in'}
+		</>
 	)
 }
 

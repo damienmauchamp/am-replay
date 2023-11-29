@@ -1,4 +1,4 @@
-import {} from 'react'
+import { useEffect, useState } from 'react'
 import Button from '@/components/AppleMusic/Buttons/Button'
 import { IoLogOutOutline } from 'react-icons/io5'
 import { logDebug } from '@/helpers/debug'
@@ -14,6 +14,7 @@ interface LogoutButtonProps {
 
 const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
 	const { logged, getInstance, updateLogin } = useMusicKitContext()
+	const [display, setDisplay] = useState<boolean>(false)
 
 	const afterLogout = () => {
 		props.onLogout && props.onLogout()
@@ -33,9 +34,19 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
 		}, 500)
 	}
 
+	useEffect(() => {
+		setDisplay(logged)
+	}, [])
+
+	useEffect(() => {
+		log('useEffect[logged]:', logged)
+		setDisplay(logged)
+	}, [logged])
+
 	return (
 		<>
-			{logged ? (
+			{/* {logged && ( */}
+			{display && (
 				<Button
 					onClick={handleLogout}
 					Color="#FF2D55"
@@ -44,8 +55,6 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
 				>
 					Logout
 				</Button>
-			) : (
-				''
 			)}
 		</>
 	)

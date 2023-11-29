@@ -146,8 +146,8 @@ const Button = ({
 				${classes['buttonState' + (!props.disabled ? 'Enabled' : 'Disabled')]}
 				${classes['buttonOnMaterialState' + (OnMaterialState ? 'On' : 'Off')]}
 				`}
-				onClick={handleClick}
 				style={{ ...props.style, ...buttonStyle() }}
+				onClick={handleClick}
 			>
 				{LabelType !== ButtonLabelType.Text && Icon ? (
 					<>

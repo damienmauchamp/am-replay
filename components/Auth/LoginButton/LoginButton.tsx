@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import classes from './LoginButton.module.css'
 import Button from '@/components/AppleMusic/Buttons/Button'
-import { IoLogInOutline } from 'react-icons/io5'
+import { IoLogInOutline, IoPerson } from 'react-icons/io5'
 import { logDebug } from '@/helpers/debug'
 import { useMusicKitContext } from '@/context/MusicKitContext'
 
@@ -70,7 +70,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 							  : classes.buttonBg
 					}
 					onClick={handleLogin}
-					Icon={logged ? null : IoLogInOutline}
+					Icon={logged ? IoPerson : IoLogInOutline}
 				>
 					{logged ? 'Logged' : isLogging ? 'Logging in' : 'Login'}
 				</Button>
