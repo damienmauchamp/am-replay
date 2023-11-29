@@ -15,16 +15,7 @@ const log = (...args: any) => {
 
 // todo : Error wrap si erreur de chargement du musicKit
 const Landing: NextPage<{}> = () => {
-	// const [loading, setLoading] = useState<boolean>(false)
-	// const { musicKit, setMusicKit } = useMusicKitContext()
 	const { logged } = useMusicKitContext()
-
-	useEffect(() => {
-		log('(useEffect) mounted')
-	}, [])
-	useEffect(() => {
-		log('(useEffect) updated')
-	})
 
 	return (
 		<MusicKitContextProvider>
@@ -34,7 +25,6 @@ const Landing: NextPage<{}> = () => {
 				</header>
 
 				<main className={`flex flex-col items-center p-4`}>
-					<div>Index.logged: {Number(logged)}</div>
 					<Home />
 				</main>
 			</>
