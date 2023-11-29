@@ -67,6 +67,7 @@ const Button = ({
 	OnMaterialState,
 	LabelType,
 	Color,
+	Style,
 	textStyle,
 	iconStyle,
 	ref,
@@ -98,7 +99,7 @@ const Button = ({
 		let style = {}
 
 		if (Color) {
-			if (props.Style === ButtonStyle.Bezeled && !props.disabled) {
+			if (Style === ButtonStyle.Bezeled && !props.disabled) {
 				style = {
 					...style,
 					backgroundColor: `rgba(${colorToRgbString(
@@ -107,7 +108,7 @@ const Button = ({
 				}
 			}
 
-			if (props.Style === ButtonStyle.Filled && !props.disabled) {
+			if (Style === ButtonStyle.Filled && !props.disabled) {
 				style = {
 					...style,
 					backgroundColor: Color,
@@ -121,7 +122,7 @@ const Button = ({
 	const buttonElementsStyle = () => {
 		let style = {}
 
-		if (Color && !props.disabled && props.Style !== ButtonStyle.Filled) {
+		if (Color && !props.disabled && Style !== ButtonStyle.Filled) {
 			style = {
 				...style,
 				color: Color,
@@ -140,7 +141,7 @@ const Button = ({
 				${props.className || ''} 
 				${classes.button} 
 				${classes['button' + props.Size]}
-				${classes['button' + props.Style]}
+				${classes['button' + Style]}
 				${classes['button' + LabelType]}
 				${classes['buttonState' + (!props.disabled ? 'Enabled' : 'Disabled')]}
 				${classes['buttonOnMaterialState' + (OnMaterialState ? 'On' : 'Off')]}

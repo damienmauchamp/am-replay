@@ -19,4 +19,5 @@ const Debug: React.FC<DebugProps> = ({ ...props }) => {
 	)
 }
 
-export default withMusicKit(Debug)
+export default Debug
+// export default withMusicKit(Debug)

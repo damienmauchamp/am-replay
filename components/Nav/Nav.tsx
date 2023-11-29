@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import classes from './Nav.module.css'
 import LoginButton from '../Auth/LoginButton/LoginButton'
 import LogoutButton from '../Auth/LogoutButton/LogoutButton'
 import { logDebug } from '@/helpers/debug'
+import { useMusicKitContext } from '@/context/MusicKitContext'
 
 const log = (...args: any) => {
 	logDebug('Nav', 'green', ...args)
@@ -10,114 +11,51 @@ const log = (...args: any) => {
 
 const DEBUG = true
 
-export const Nav = (props: {
-	musicKit: MusicKit.MusicKitInstance
-	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
-	onLogout: () => MusicKit.MusicKitInstance
-	// onLogout: () => void
-	// onLogout: () => MusicKit.MusicKitInstance
-}) => {
-	const [logged, setLogged] = useState<boolean>(
-		props.musicKit?.isAuthorized || false
-	)
-	const [musicKit, setMusicKit] = useState<MusicKit.MusicKitInstance>(
-		props.musicKit
-	)
+export const Nav = (props: {}) => {
+	const { logged, getInstance } = useMusicKitContext()
 
-	// if (props.musicKit !== ({} as MusicKit.MusicKitInstance)) {
-	if (props.musicKit !== musicKit) {
-		setMusicKit(props.musicKit)
+	const render = () => {
+		if (logged) {
+			// User is logged in
+			return <div>[NAV] Logged in</div>
+		} else {
+			// User is not logged in
+			return <div>[NAV] Logged out</div>
+		}
 	}
 
 	log('render:', {
-		'props.musicKit': props.musicKit,
-		'props.onLogin': props.onLogin,
-		'props.onLogout': props.onLogout,
 		logged: logged,
-		musicKit: musicKit,
 	})
 
-	/**
-	 * Login
-	 * - updating musicKit
-	 * @param musicKit
-	 */
-	const handleLogin = (musicKit: MusicKit.MusicKitInstance) => {
-		log('(onLogin) musicKit:', musicKit)
-
-		// Applying on Nav
-		setMusicKit(musicKit)
-
-		// Applying to parent
-		return props.onLogin(musicKit)
-	}
-
-	/**
-	 * Logout
-	 */
-	const handleLogout = () => {
-		log('(handleLogout)')
-
-		// Logging out
-		props.onLogout()
-		musicKit.unauthorize()
-		setMusicKit(musicKit)
-
-		// Set logged out
-		setLogged(false)
-	}
-
-	useEffect(() => {
-		log('(useEffect) MusicKit.getInstance():', MusicKit.getInstance(), {
-			Authorization: `Bearer ${MusicKit.getInstance().developerToken}`,
+	const header = () => {
+		const headers = {
+			Authorization: `Bearer ${getInstance().developerToken}`,
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
-			'Music-User-Token': MusicKit.getInstance().musicUserToken,
-		})
-
-		// MusicKit.getInstance().addEventListener(
-		// 	MusicKit.Events.authorizationStatusDidChange,
-		// 	(e: any) => {
-		// 		console.log('MusicKit.Events.authorizationStatusDidChange', e)
-		// 	}
-		// )
-	})
-
-	/**
-	 * Updating logged
-	 */
-	useEffect(() => {
-		log(
-			'(useEffect[musicKit?.isAuthorized]) musicKit?.isAuthorized:',
-			musicKit?.isAuthorized
-		)
-		setLogged(musicKit?.isAuthorized)
-	}, [musicKit?.isAuthorized])
+			'Music-User-Token': getInstance().musicUserToken,
+		}
+		log('(Headers) headers:', headers)
+		return headers
+	}
 
 	// region debug
 	const debug = () =>
 		DEBUG ? (
 			<div id="nav--debug" className="p-4">
-				<button
-					onClick={() => {
-						console.log('Headers: musicKit:', musicKit)
-						const headers = {
-							Authorization: `Bearer ${musicKit.developerToken}`,
-							Accept: 'application/json',
-							'Content-Type': 'application/json',
-							'Music-User-Token': musicKit.musicUserToken,
-						}
-						console.log('Headers: headers:', headers)
-						return headers
-					}}
-				>
-					getHeaders()
-				</button>
-
+				<div>[NAV] Logged {logged ? 'in' : 'out'}</div>
+				<hr />
+				<button onClick={() => header()}>getHeaders()</button>
 				<ul>
-					<li>logged: {Number(logged)}</li>
+					<li>Nav.logged: {Number(logged)}</li>
 					<li>
-						isAuthorized: {Number(musicKit?.isAuthorized || false)}
+						<button
+							onClick={() => {
+								console.log(getInstance())
+							}}
+						>
+							Nav.getInstance()
+						</button>
 					</li>
 				</ul>
 			</div>
@@ -129,11 +67,11 @@ export const Nav = (props: {
 	return (
 		<>
 			<nav className={classes.nav}>
-				<LoginButton onLogin={handleLogin} />
-				<LogoutButton onLogout={handleLogout} />
+				<LoginButton />
+				<LogoutButton />
 			</nav>
 
-			{/* {debug()} */}
+			{debug()}
 		</>
 	)
 }
