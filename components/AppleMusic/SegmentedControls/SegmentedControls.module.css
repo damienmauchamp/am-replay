@@ -8,6 +8,7 @@
 	@apply grow shrink basis-0 self-stretch px-2.5 py-[3px] justify-start items-center flex;
 	@apply cursor-pointer;
 	@apply whitespace-nowrap;
+	@apply font-light;
 }
 
 .button.selected {
