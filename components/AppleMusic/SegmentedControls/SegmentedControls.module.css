@@ -1,0 +1,34 @@
+.segment {
+	@apply h-7 p-0.5 bg-zinc-500 rounded-[9px] justify-center items-center inline-flex;
+	@apply bg-opacity-10 dark:bg-opacity-25;
+}
+
+/* @todo : hover/active */
+.button {
+	@apply grow shrink basis-0 self-stretch px-2.5 py-[3px] justify-start items-center flex;
+	@apply cursor-pointer;
+	@apply whitespace-nowrap;
+}
+
+.button.selected {
+	@apply rounded-[7px];
+	@apply bg-white dark:bg-stone-500;
+	@apply shadow;
+	/* @apply border border-black border-opacity-5; */
+	@apply dark:shadow-none dark:border-none;
+}
+
+.label {
+	@apply grow shrink basis-0 h-[18px] text-center text-[13px] leading-[18px];
+	@apply text-black dark:text-white;
+	/* @apply	font-['SF Pro'] */
+	@apply overflow-hidden;
+}
+
+.button.selected > .label {
+	@apply font-normal;
+}
+
+.separator {
+	@apply w-px h-3 opacity-30 rounded-[0.50px];
+}

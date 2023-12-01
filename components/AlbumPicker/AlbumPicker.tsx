@@ -1,33 +1,26 @@
-import withMusicKit from '@/hoc/WithMusicKit'
 import React, { useEffect, useState } from 'react'
 import LibraryAlbum from '../Elements/LibraryAlbum/LibraryAlbum'
 import Button from '../AppleMusic/Buttons/Button'
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
 import { logDebug } from '@/helpers/debug'
+import { useMusicKitContext } from '@/context/MusicKitContext'
 
 const log = (...args: any) => {
 	logDebug('AlbumPicker', 'teal', ...args)
 }
 
-interface AlbumPickerProps extends WithMusicKitProps {}
+interface AlbumPickerProps {}
 
-const AlbumPicker: React.FC<AlbumPickerProps> = ({
-	mk,
-	isAuthorized,
-	...props
-}) => {
-	log('AlbumPicker mk:', mk, isAuthorized())
+const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
+	const { logged, getInstance, isAuthorized } = useMusicKitContext()
+	const [display, setDisplay] = useState<boolean>(false)
 
-	if (!isAuthorized()) {
-		return 'Please log in'
-	}
 	const apiLimit = 100,
 		loopMaxPage = 999
 
 	let loopPages: number[] = []
 
 	const [loading, setLoading] = useState<boolean>(false)
-	// const [authorized, setAuthorized] = useState<boolean>(isAuthorized())
 
 	const [apiPage, setApiPage] = useState<number>(1)
 	const [fetchComplete, setFetchComplete] = useState<boolean>(false)
@@ -47,6 +40,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({
 			'loadAlbums',
 			{
 				'isAuthorized()': isAuthorized(),
+				display: display,
+				logged: logged,
 				fetchComplete: fetchComplete,
 				apiPage: apiPage,
 				loop: loop,
@@ -56,24 +51,23 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({
 			data
 		)
 
-		if (!isAuthorized() || !mk || !mk.api) {
+		if (!logged || !isAuthorized()) {
 			return
 		}
 
 		setLoading(true)
-
-		log('loadAlbums: mk.api', mk.api)
-		log('loadAlbums: mk.api.library', mk.api.library)
 
 		const params: MusicKit.QueryParameters = {
 			limit: apiLimit,
 			offset: (apiPage - 1) * apiLimit,
 		}
 
-		log('loadAlbums: params:', params)
+		log('loadAlbums: getInstance().api', getInstance().api)
+		log('loadAlbums: getInstance().api.library', getInstance().api.library)
+		log('loadAlbums: [albums] params:', params)
 
-		return mk.api.library
-			.albums(null, params)
+		return getInstance()
+			.api.library.albums(null, params)
 			.then((response: MusicKit.Resource[]) => {
 				log('loadAlbums OK: response', response)
 
@@ -151,15 +145,17 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({
 	}
 
 	useEffect(() => {
-		log('useEffect[isAuthorized]:', isAuthorized)
+		console.log(`Component AlbumPicker mounted.`)
+		log('useEffect[isAuthorized()]:', isAuthorized())
 
-		if (isAuthorized()) {
-			loadAlbums()
+		setDisplay(logged && isAuthorized())
+		return () => {
+			console.log(`Component AlbumPicker unmounted.`)
 		}
-		// }, [authorized])
 	}, [])
 
 	useEffect(() => {
+		console.log(`Component AlbumPicker updated.`)
 		log('useEffect[apiPage, loop]:', apiPage, loop)
 
 		if (!loop) {
@@ -186,75 +182,103 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({
 		loadAlbums()
 	}, [apiPage, loop])
 
+	useEffect(() => {
+		log('useEffect[display]:', display)
+		if (display) {
+			loadAlbums()
+		}
+	}, [display])
+
+	useEffect(() => {
+		log('useEffect[logged]:', logged)
+		setDisplay(logged)
+	}, [logged])
+
 	return (
-		<div>
-			<div className="">
-				<h3>Albums</h3>
+		<>
+			{(display && (
+				<>
+					<div className="py-4">
+						<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
 
-				{albums.length ? (
-					<>
-						<LibraryAlbum
-							album={albums[displayedAlbumId]}
-							displayedAlbumId={displayedAlbumId}
-						/>
-						<div
-							className={
-								'flex flex-row items-center justify-between py-4'
-							}
-						>
-							<IoArrowBack
-								size={48}
-								className="cursor-pointer"
-								onClick={() => handlePrevNext('prev')}
-							/>
-							<IoArrowForward
-								size={48}
-								className="cursor-pointer"
-								onClick={() => handlePrevNext('next')}
-							/>
+						<ul className="flex flex-row gap-2 justify-center py-2">
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => loadAlbums()}
+								>
+									loadAlbums()
+								</Button>
+							</li>
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => loadAllAlbums()}
+								>
+									loadAllAlbums()
+								</Button>
+							</li>
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => stopLoading()}
+								>
+									stopLoading()
+								</Button>
+							</li>
+							<li>
+								<Button
+									Style="Filled"
+									onClick={() => resetPage()}
+								>
+									resetPage()
+								</Button>
+							</li>
+						</ul>
+
+						{albums.length ? (
+							<>
+								<LibraryAlbum
+									album={albums[displayedAlbumId]}
+									displayedAlbumId={displayedAlbumId}
+								/>
+								<div
+									className={
+										'flex flex-row items-center justify-between py-4'
+									}
+								>
+									<IoArrowBack
+										size={48}
+										className="cursor-pointer"
+										onClick={() => handlePrevNext('prev')}
+									/>
+									<IoArrowForward
+										size={48}
+										className="cursor-pointer"
+										onClick={() => handlePrevNext('next')}
+									/>
+								</div>
+							</>
+						) : (
+							'No albums to display yet'
+						)}
+					</div>
+
+					<div className="">
+						<h3>Debug API</h3>
+						<div>
+							Nb: {albums ? albums.length : 'NULL'} -{' '}
+							{albumFetching
+								? `Fetching page ${apiPage}...`
+								: 'Done'}
 						</div>
-					</>
-				) : (
-					'No albums to display yet'
-				)}
-			</div>
-
-			<div className="">
-				<h3>Debug API</h3>
-				{loading ? 'LOADING...' : ''}
-
-				<br />
-				<div>
-					Nb: {albums ? albums.length : 'NULL'} -{' '}
-					{albumFetching ? `Fetching page ${apiPage}...` : 'Done'}
-				</div>
-				<div>Page : {apiPage}</div>
-
-				<ul>
-					<li>
-						<Button Style="Filled" onClick={() => loadAlbums()}>
-							loadAlbums()
-						</Button>
-					</li>
-					<li>
-						<Button Style="Filled" onClick={() => loadAllAlbums()}>
-							loadAllAlbums()
-						</Button>
-					</li>
-					<li>
-						<Button Style="Filled" onClick={() => stopLoading()}>
-							stopLoading()
-						</Button>
-					</li>
-					<li>
-						<Button Style="Filled" onClick={() => resetPage()}>
-							resetPage()
-						</Button>
-					</li>
-				</ul>
-			</div>
-		</div>
+						<div>Page : {apiPage}</div>
+					</div>
+				</>
+			)) ||
+				'Please log in'}
+		</>
 	)
 }
 
-export default withMusicKit(AlbumPicker)
+export default AlbumPicker

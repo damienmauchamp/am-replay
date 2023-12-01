@@ -1,49 +1,52 @@
 import { useEffect, useState } from 'react'
-import classes from './LogoutButton.module.css'
-import withMusicKit from '@/hoc/WithMusicKit'
 import Button from '@/components/AppleMusic/Buttons/Button'
-import { IoLogOut, IoLogOutOutline } from 'react-icons/io5'
+import { IoLogOutOutline } from 'react-icons/io5'
 import { logDebug } from '@/helpers/debug'
+import { useMusicKitContext } from '@/context/MusicKitContext'
 
 const log = (...args: any) => {
 	logDebug('LogoutButton', 'purple', ...args)
 }
 
-interface LogoutButtonProps extends WithMusicKitProps {
-	onLogout: () => void
+interface LogoutButtonProps {
+	onLogout?: () => void
 }
+
 const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
-	const [logged, setLogged] = useState<boolean>(
-		props.isAuthorized // props.mk?.isAuthorized || false
-	)
+	const { logged, getInstance, updateLogin } = useMusicKitContext()
+	const [display, setDisplay] = useState<boolean>(false)
 
-	/**
-	 * Logout
-	 */
+	const afterLogout = () => {
+		props.onLogout && props.onLogout()
+		updateLogin()
+	}
+
 	const handleLogout = async () => {
-		log('(handleLogout)')
-
 		// Logging out
-		// props.onLogout()
-		await props.mk.unauthorize()
-		// setMusicKit(props.mk)
+		await getInstance().unauthorize()
 
-		props.onLogout()
-
-		// Set logged out
-		setLogged(false)
-		// setAuthorized(false)
+		let intervalId = setInterval(() => {
+			if (!getInstance().isAuthorized) {
+				clearInterval(intervalId)
+				// Updating
+				afterLogout()
+			}
+		}, 500)
 	}
 
 	useEffect(() => {
-		log('useEffect[props.isAuthorized]:', props.isAuthorized)
-		log('useEffect[props.mk.isAuthorized]:', props.mk.isAuthorized)
-		setLogged(props.mk.isAuthorized)
-	}, [props.mk.isAuthorized])
+		setDisplay(logged)
+	}, [])
+
+	useEffect(() => {
+		log('useEffect[logged]:', logged)
+		setDisplay(logged)
+	}, [logged])
 
 	return (
 		<>
-			{logged ? (
+			{/* {logged && ( */}
+			{display && (
 				<Button
 					onClick={handleLogout}
 					Color="#FF2D55"
@@ -52,11 +55,9 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ ...props }) => {
 				>
 					Logout
 				</Button>
-			) : (
-				''
 			)}
 		</>
 	)
 }
 
-export default withMusicKit(LogoutButton)
+export default LogoutButton

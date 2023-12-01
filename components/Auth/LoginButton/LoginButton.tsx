@@ -1,29 +1,32 @@
 import { useEffect, useState } from 'react'
 import classes from './LoginButton.module.css'
-import withMusicKit from '@/hoc/WithMusicKit'
 import Button from '@/components/AppleMusic/Buttons/Button'
-import { IoLogInOutline } from 'react-icons/io5'
+import { IoLogInOutline, IoPerson } from 'react-icons/io5'
 import { logDebug } from '@/helpers/debug'
-
-interface LoginButtonProps extends WithMusicKitProps {
-	onLogin: (musicKit: MusicKit.MusicKitInstance) => void
-}
+import { useMusicKitContext } from '@/context/MusicKitContext'
 
 const log = (...args: any) => {
 	logDebug('LoginButton', 'pink', ...args)
 }
 
+interface LoginButtonProps {
+	onLogin?: () => void
+}
+
 const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
+	const { logged, getInstance, updateLogin } = useMusicKitContext()
 	const [loading, setLoading] = useState<boolean>(true)
 	const [isLogging, setIsLogging] = useState<boolean>(false)
-	const [logged, setLogged] = useState<boolean>(
-		props.mk?.isAuthorized || false
-	)
+
+	const afterLogin = () => {
+		// Updating
+		updateLogin()
+		props.onLogin && props.onLogin()
+		setIsLogging(false)
+	}
 
 	const handleLogin = () => {
-		log('(handleLogin) props.mk?.isAuthorized', props.mk?.isAuthorized)
-
-		if (logged) {
+		if (getInstance().isAuthorized) {
 			// Already logged
 			log('(handleLogin) Already logged')
 			return
@@ -31,47 +34,27 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 
 		setIsLogging(true)
 
-		//
-		return props.mk
+		return getInstance()
 			.authorize()
 			.then((response: any) => {
-				log('(handleLogin) authorized reponse:', response)
-
-				// updating musicKit
-				// todo : see if needed
-				props.onLogin(props.mk)
-
-				setIsLogging(false)
-				setLogged(true)
+				log('(handleLogin) authorized reponse:', response, {
+					musicKit: getInstance(),
+					unauthorize: getInstance().unauthorize || 'ta mère',
+				})
+				afterLogin()
 			})
 			.catch((err: any) => {
 				log('(handleLogin) authorized ERROR:', err)
 				console.error(err)
-
-				// updating musicKit
-				// todo : see if needed
-				props.onLogin(props.mk)
-
-				setIsLogging(false)
+				afterLogin()
 			})
 	}
 
 	useEffect(() => {
-		log('(useEffect[])', logged)
-		log('(useEffect[]) MusicKit:', MusicKit)
-		log('(useEffect[]) MusicKit.getInstance():', MusicKit.getInstance())
-		log('(useEffect[]) props.testMethod():', props.testMethod())
-
-		setTimeout(() => {
-			setLoading(false)
-		}, 500)
+		// 	setTimeout(() => {
+		setLoading(false)
+		// 	}, 500)
 	}, [])
-
-	useEffect(() => {
-		log('useEffect[props.isAuthorized]:', props.isAuthorized)
-		log('useEffect[props.mk.isAuthorized]:', props.mk.isAuthorized)
-		setLogged(props.mk.isAuthorized)
-	}, [props.mk.isAuthorized])
 
 	return (
 		<>
@@ -87,23 +70,13 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 							  : classes.buttonBg
 					}
 					onClick={handleLogin}
-					Icon={logged ? null : IoLogInOutline}
+					Icon={logged ? IoPerson : IoLogInOutline}
 				>
 					{logged ? 'Logged' : isLogging ? 'Logging in' : 'Login'}
 				</Button>
 			)}
-
-			{/* debug */}
-			<button
-				onClick={() => {
-					props.testMethod()
-				}}
-			>
-				testMethod()
-			</button>
 		</>
 	)
 }
 
-export default withMusicKit(LoginButton)
-// export const LoginButtonComponent = LoginButton
+export default LoginButton

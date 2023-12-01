@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
+/**
+ * @deprecated Not used anymore
+ * @param WrappedComponent
+ * @returns
+ */
 const withMusicKit = <T extends object>(
 	WrappedComponent: React.ComponentType<T>
 ) => {
