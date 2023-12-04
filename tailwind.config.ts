@@ -4,7 +4,7 @@ import type { Config } from 'tailwindcss'
  * [iOS17] Colors from Apple Design Resources - iOS 17
  * https://www.figma.com/community/file/1248375255495415511
  */
-const iOSTheme = {
+export const iOSTheme = {
 	color: {
 		red: {
 			light: '#FF3B30',
