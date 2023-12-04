@@ -465,6 +465,33 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 
 	/* ------ */
 
+	const renderTopButtons = () => {
+		return (
+			<ul className="flex flex-row gap-2 justify-center py-2">
+				<li>
+					<Button Style="Filled" onClick={() => loadAlbums()}>
+						loadAlbums()
+					</Button>
+				</li>
+				<li>
+					<Button Style="Filled" onClick={() => loadAllAlbums()}>
+						loadAllAlbums()
+					</Button>
+				</li>
+				<li>
+					<Button Style="Filled" onClick={() => stopLoading()}>
+						stopLoading()
+					</Button>
+				</li>
+				<li>
+					<Button Style="Filled" onClick={() => resetPage()}>
+						resetPage()
+					</Button>
+				</li>
+			</ul>
+		)
+	}
+
 	const renderAlbums = () => {
 		const debug = false
 		const renderArrows = () =>
@@ -505,8 +532,6 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		)
 	}
 
-	/* ------ */
-
 	const renderTotal = () => {
 		return (
 			<div className={''}>
@@ -527,86 +552,47 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		)
 	}
 
-	return (
-		<>
-			{(display && (
-				<>
-					<div className="py-4">
-						<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
+	const render = () => {
+		return (
+			<>
+				<div className="py-4">
+					<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
 
-						<ul className="flex flex-row gap-2 justify-center py-2">
-							<li>
-								<Button
-									Style="Filled"
-									onClick={() => loadAlbums()}
-								>
-									loadAlbums()
-								</Button>
-							</li>
-							<li>
-								<Button
-									Style="Filled"
-									onClick={() => loadAllAlbums()}
-								>
-									loadAllAlbums()
-								</Button>
-							</li>
-							<li>
-								<Button
-									Style="Filled"
-									onClick={() => stopLoading()}
-								>
-									stopLoading()
-								</Button>
-							</li>
-							<li>
-								<Button
-									Style="Filled"
-									onClick={() => resetPage()}
-								>
-									resetPage()
-								</Button>
-							</li>
-						</ul>
+					{renderTopButtons()}
 
-						{renderAlbums()}
+					{renderAlbums()}
+				</div>
+
+				{/* Action buttons */}
+				{actionButtons()}
+
+				{renderTotal()}
+
+				<div className="">
+					<h3>Debug API</h3>
+					<ul>
+						<li>displayedAlbumId : {displayedAlbumId}</li>
+					</ul>
+					<div>
+						Nb: {albums ? albums.length : 'NULL'} -{' '}
+						{albumFetching ? `Fetching page ${apiPage}...` : 'Done'}
 					</div>
+					<div>Page : {apiPage}</div>
+					<Button
+						Style="Bezeled"
+						onClick={() => displayFirstAlbumWithoutCategory()}
+					>
+						displayFirstAlbumWithoutCategory()
+					</Button>
+					<Button Style="Bezeled" onClick={() => console.log(data)}>
+						DATA
+					</Button>
+				</div>
+			</>
+		)
+	}
 
-					{/* Action buttons */}
-					{actionButtons()}
-
-					{renderTotal()}
-
-					<div className="">
-						<h3>Debug API</h3>
-						<ul>
-							<li>displayedAlbumId : {displayedAlbumId}</li>
-						</ul>
-						<div>
-							Nb: {albums ? albums.length : 'NULL'} -{' '}
-							{albumFetching
-								? `Fetching page ${apiPage}...`
-								: 'Done'}
-						</div>
-						<div>Page : {apiPage}</div>
-						<Button
-							Style="Bezeled"
-							onClick={() => displayFirstAlbumWithoutCategory()}
-						>
-							displayFirstAlbumWithoutCategory()
-						</Button>
-						<Button
-							Style="Bezeled"
-							onClick={() => console.log(data)}
-						>
-							DATA
-						</Button>
-					</div>
-				</>
-			)) ||
-				'Please log in'}
-		</>
-	)
+	return <>{(display && render()) || 'Please log in'}</>
 }
 
 export default AlbumPicker
