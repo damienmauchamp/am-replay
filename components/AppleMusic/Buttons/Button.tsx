@@ -27,6 +27,15 @@ enum ButtonLabelType {
 	Text = 'Text',
 }
 
+type ColorProps =
+	| undefined
+	| string
+	| {
+			DEFAULT: string
+			light: string
+			dark: string
+	  }
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	/**
 	 * Le texte ou le composant qui sera affiché à l'intérieur du bouton.
@@ -50,7 +59,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	// Label: string (Play)
 
 	//
-	Color?: string
+	Color?: ColorProps
 	textStyle?: CSSProperties
 	iconStyle?: CSSProperties
 }
@@ -95,15 +104,23 @@ const Button = ({
 		debug()
 	}
 
+	const getColor = (color: ColorProps) => {
+		if (!color) {
+			return ''
+		}
+		return typeof color === 'string' ? color : color.DEFAULT || color.light
+	}
+
 	const buttonStyle = () => {
 		let style = {}
 
-		if (Color) {
+		console.log('Color', Color, getColor(Color))
+		if (getColor(Color)) {
 			if (Style === ButtonStyle.Bezeled && !props.disabled) {
 				style = {
 					...style,
 					backgroundColor: `rgba(${colorToRgbString(
-						Color
+						getColor(Color)
 					)} / var(--tw-bg-opacity))`,
 				}
 			}
@@ -111,7 +128,7 @@ const Button = ({
 			if (Style === ButtonStyle.Filled && !props.disabled) {
 				style = {
 					...style,
-					backgroundColor: Color,
+					backgroundColor: getColor(Color),
 				}
 			}
 		}
@@ -122,10 +139,14 @@ const Button = ({
 	const buttonElementsStyle = () => {
 		let style = {}
 
-		if (Color && !props.disabled && Style !== ButtonStyle.Filled) {
+		if (
+			getColor(Color) &&
+			!props.disabled &&
+			Style !== ButtonStyle.Filled
+		) {
 			style = {
 				...style,
-				color: Color,
+				color: getColor(Color),
 			}
 		}
 
