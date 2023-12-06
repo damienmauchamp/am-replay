@@ -25,29 +25,34 @@ type LibraryAlbumArtwork = {
 	url: string
 }
 
+const defaultSize = 720
+export const getImageUrl = (
+	album: LibraryAlbum,
+	size: number = defaultSize
+) => {
+	if (!album.attributes.artwork || !album.attributes.artwork.url) {
+		// https://is1-ssl.mzstatic.com/image/thumb/Features127/v4/75/f9/6f/75f96fa5-99ca-0854-3aae-8f76f5cb7fb5/source/500x500bb.jpeg
+		return '/img/default-cover.jpg'
+	}
+	return album.attributes.artwork.url
+		.replace('{w}', String(size))
+		.replace('{h}', String(size))
+}
+
+export const getImageAlt = (album: LibraryAlbum) =>
+	`${album.attributes.name} by ${album.attributes.artistName}`
+
 const LibraryAlbum = (props: {
 	album: LibraryAlbum
 	displayedAlbumId: number
 }) => {
-	const defaultSize = 500
-
-	const getImageUrl = (album: LibraryAlbum, size: number = defaultSize) => {
-		if (!album.attributes.artwork || !album.attributes.artwork.url) {
-			// https://is1-ssl.mzstatic.com/image/thumb/Features127/v4/75/f9/6f/75f96fa5-99ca-0854-3aae-8f76f5cb7fb5/source/500x500bb.jpeg
-			return '/img/default-cover.jpg'
-		}
-		return album.attributes.artwork.url
-			.replace('{w}', String(size))
-			.replace('{h}', String(size))
-	}
-
 	return (
 		<>
 			<div>
 				<Image
 					className={classes.artwork}
 					src={getImageUrl(props.album, defaultSize)}
-					alt={`${props.album.attributes.name} by ${props.album.attributes.artistName}`}
+					alt={getImageAlt(props.album)}
 					width={defaultSize}
 					height={defaultSize}
 				/>

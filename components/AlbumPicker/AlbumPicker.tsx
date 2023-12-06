@@ -8,6 +8,8 @@ import tailwindConfig, { iOSTheme } from '@/tailwind.config'
 import TinderCard from 'react-tinder-card'
 import SegmentedControls from '../AppleMusic/SegmentedControls/SegmentedControls'
 import styles from './AlbumPicker.module.css'
+import TopTab from './Tabs/TopTab'
+import TodoTab from './Tabs/TodoTab'
 
 const log = (...args: any) => {
 	logDebug('AlbumPicker', 'teal', ...args)
@@ -180,12 +182,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 
 	useEffect(() => {
 		console.log(`Component AlbumPicker mounted.`)
-		log('useEffect[isAuthorized()]:', isAuthorized())
 
-		// setDisplay(logged && isAuthorized())
-		if (logged && isAuthorized()) {
-			setDisplay(true)
-		}
+		setDisplay(logged && isAuthorized())
 
 		return () => {
 			console.log(`Component AlbumPicker unmounted.`)
@@ -194,7 +192,6 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 
 	useEffect(() => {
 		console.log(`Component AlbumPicker updated.`)
-		log('useEffect[apiPage, loop]:', apiPage, loop)
 
 		if (!loop) {
 			setAlbumFetching(false)
@@ -202,14 +199,12 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		}
 
 		if (fetchComplete || (loopMaxPage !== null && apiPage > loopMaxPage)) {
-			log('useEffect[apiPage, loop]: stop')
 			setAlbumFetching(false)
 			setLoop(false)
 			return
 		}
 
 		if (loopPages.includes(apiPage)) {
-			log('useEffect[apiPage, loop]: wtf', apiPage)
 			setAlbumFetching(false)
 			setLoop(false)
 			return
@@ -221,14 +216,12 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	}, [apiPage, loop])
 
 	useEffect(() => {
-		log('useEffect[display]:', display)
 		if (display) {
 			// loadAlbums()
 		}
 	}, [display])
 
 	useEffect(() => {
-		log('useEffect[logged]:', logged)
 		setDisplay(logged)
 	}, [logged])
 
@@ -345,6 +338,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			}
 			return true
 		})
+
+		console.log('getAlbumCategory =>', albumId, actionId)
 		return actionId
 	}
 
@@ -353,6 +348,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	}
 
 	const getFirstAlbumIdWithoutCategory = () => {
+		// todo : prendre en compte le displayedId
 		let firstIndex = null
 		albums.every((album, index) => {
 			if (!albumHasCategory(album.id)) {
@@ -419,6 +415,10 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		if (addCurrentIdTo('todo')) {
 			handlePrevNext('next')
 		}
+	}
+
+	const onAlbumDelete = (identifier: string, albumId: string) => {
+		log('callback:', identifier, albumId)
 	}
 
 	/* ------ */
@@ -522,10 +522,19 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		)
 
 	// region test
+
+	const getNextAlbum = () => {
+		const next = albums[displayedAlbumId]
+		if (next && !albumHasCategory(next.id)) {
+			return next
+		}
+
+		const nextIndex = getFirstAlbumIdWithoutCategory()
+		return nextIndex && albums[nextIndex] && !albumHasCategory(nextIndex)
+	}
 	const renderAlbums = () => {
 		return albums.length ? (
-			albums[displayedAlbumId] &&
-			!albumHasCategory(albums[displayedAlbumId].id) ? (
+			getNextAlbum() ? (
 				<>
 					<LibraryAlbum
 						album={albums[displayedAlbumId]}
@@ -542,15 +551,13 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	}
 
 	const renderNewAlbums = () => {
+		return 'Nope.'
+
 		if (!albums.length) {
 			return 'No card to display'
 		}
 
-		if (
-			!albums[displayedAlbumId] ||
-			albumHasCategory(albums[displayedAlbumId].id)
-		) {
-			// todo : if there's album left to judge : displayFirstAlbumWithoutCategory()
+		if (!getNextAlbum()) {
 			return 'No card left'
 		}
 
@@ -643,38 +650,37 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		)
 	}
 
-	// region Tab.Picker
 	const renderTabPicker = () => {
-		return renderTab(
-			0,
+		return (
 			<>
 				<h2>Picker</h2>
 
-				<section className={styles.section} id="topButtons">
+				<section id="topButtons">
 					<h3>TopButtons</h3>
 					{renderTopButtons()}
 				</section>
 
-				<section className={styles.section} id="albumsOld">
+				<section className="flex justify-center" id="albumsOld">
 					<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
 
-					{renderAlbums()}
+					<div className="max-w-sm">
+						{renderAlbums()}
+
+						{/* Action buttons */}
+						{actionButtons()}
+
+						{renderTotal()}
+					</div>
 				</section>
 
-				<section className={styles.section} id="albums">
+				<section id="albums">
 					<h3>Albums cards {loading ? '(LOADING...)' : ''}</h3>
 
 					{/* <div className="py-4"> */}
 					{renderNewAlbums()}
-
-					{/* Action buttons */}
-					{actionButtons()}
-
-					{renderTotal()}
-					{/* </div> */}
 				</section>
 
-				<section className={styles.section} id="debug">
+				<section id="debug">
 					{/* <div className="py-4"> */}
 					<h3>Debug API</h3>
 					<ul>
@@ -698,53 +704,6 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			</>
 		)
 	}
-	// endregion Tab.Picker
-
-	// region Tab.Top
-	const renderTabTop = () => {
-		return renderTab(
-			1,
-			<>
-				<h2>renderTabTop</h2>
-
-				<section>
-					<ul className="list-disc">
-						{data.years[year].picked.map((albumId) => {
-							const libraryAlbum = data.years[year].albums.find(
-								(album) => album.id === albumId
-							)
-
-							return (
-								<li>
-									<p>{albumId}</p>
-									<p>{libraryAlbum?.attributes.name}</p>
-									<p>{libraryAlbum?.attributes.artistName}</p>
-									<p>
-										{libraryAlbum?.attributes.releaseDate}
-									</p>
-								</li>
-							)
-						})}
-					</ul>
-				</section>
-			</>
-		)
-	}
-	// endregion Tab.Top
-
-	// region Tab.Todolist
-	const renderTabTodolist = () => {
-		return renderTab(
-			2,
-			<>
-				<h2>renderTabTodolist</h2>
-				<section>
-					<p>renderTabTodolist</p>
-				</section>
-			</>
-		)
-	}
-	// endregion Tab.Todolist
 
 	// endregion render Tabs
 
@@ -763,9 +722,26 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 					// style={{ width: '100%' }}
 				/>
 
-				{renderTabPicker()}
-				{renderTabTop()}
-				{renderTabTodolist()}
+				{renderTab(0, renderTabPicker())}
+
+				{renderTab(
+					1,
+					<TopTab
+						identifier="picked"
+						albums={data.years[year].albums}
+						picked={data.years[year].picked}
+						onDelete={onAlbumDelete}
+					/>
+				)}
+				{renderTab(
+					2,
+					<TodoTab
+						identifier="todo"
+						albums={data.years[year].albums}
+						todo={data.years[year].todo}
+						onDelete={onAlbumDelete}
+					/>
+				)}
 			</>
 		)
 	}

@@ -12,10 +12,11 @@
 }
 
 .page section {
-	@apply px-2 pb-2;
+	@apply pb-2;
+	/* @apply px-2; */
 }
 
 .page section > h3 {
-	@apply font-bold text-lg;
+	@apply font-semibold text-lg;
 	@apply border-b pb-1;
 }
