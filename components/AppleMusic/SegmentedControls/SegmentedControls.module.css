@@ -1,6 +1,13 @@
 .segment {
 	@apply h-7 p-0.5 bg-zinc-500 rounded-[9px] justify-center items-center inline-flex;
 	@apply bg-opacity-10 dark:bg-opacity-25;
+	@apply flex;
+}
+
+.container {
+	--highlight-width: auto;
+	--highlight-x-pos: 0;
+	/* @apply flex; */
 }
 
 /* @todo : hover/active */
@@ -9,14 +16,39 @@
 	@apply cursor-pointer;
 	@apply whitespace-nowrap;
 	@apply font-light;
+
+	@apply relative;
 }
 
-.button.selected {
+.buttonSelected {
 	@apply rounded-[7px];
 	@apply bg-white dark:bg-stone-500;
 	@apply shadow;
 	/* @apply border border-black border-opacity-5; */
 	@apply dark:shadow-none dark:border-none;
+}
+
+/* .button.selected { */
+/* 	@apply buttonSelected; */
+/* } */
+
+.controls::before {
+	@apply buttonSelected;
+	content: '';
+	width: var(--highlight-width);
+	transform: translateX(var(--highlight-x-pos));
+	@apply absolute top-0.5 bottom-0.5 left-0;
+	@apply overflow-hidden m-auto z-0;
+}
+/* .controls.ready::before { */
+.controls::before {
+	transition:
+		transform 0.3s ease,
+		width 0.3s ease;
+}
+
+.controls input {
+	@apply opacity-0 m-0 top-0 right-0 bottom-0 left-0 absolute w-full cursor-pointer h-full;
 }
 
 .label {
@@ -32,4 +64,9 @@
 
 .separator {
 	@apply w-px h-3 opacity-30 rounded-[0.50px];
+}
+
+.controls {
+	/* @apply inline-flex; */
+	@apply relative;
 }

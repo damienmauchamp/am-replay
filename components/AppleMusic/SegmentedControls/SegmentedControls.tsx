@@ -1,53 +1,104 @@
 import classes from './SegmentedControls.module.css'
+import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 
-import React, { CSSProperties, useState } from 'react'
-
-interface SegmentedControlsProps {
+// region props
+export interface SegmentedControlsProps {
 	selected?: number
-	onSelect?: (index: number, prev: number) => void
-	labels: string[]
+	onSelect?: (
+		index: number,
+		prev: number,
+		item: SegmentedControlsItem
+	) => void
+	items: SegmentedControlsItem[]
 	style?: CSSProperties
+	name: string
+	controlRef: any
+	resize: boolean
+}
+
+export interface SegmentedControlsItem {
+	label: string
+	value: string | number
+	ref: any
 }
 
 const defaultProps: SegmentedControlsProps = {
 	selected: 0,
-	onSelect: (index: number, prev: number) => {},
-	labels: [],
+	onSelect: () => {},
+	items: [],
+	// labels: [],
+	style: {},
+	name: String(`sc-${Date.now() * Math.random()}`),
+	controlRef: { current: null },
+	resize: true,
 }
+// endregion props
 
-const SegmentedControls = ({ labels, ...props }: SegmentedControlsProps) => {
+const SegmentedControls = ({
+	items,
+	// labels,
+	onSelect,
+	name,
+	controlRef,
+	resize,
+	...props
+}: SegmentedControlsProps) => {
 	const [selected, setSelected] = useState<number>(props.selected || 0)
-	const n = labels.length
+	const uniqid = name + String(Date.now() * Math.random())
+	const componentReady = useRef(false)
+	const [componentWidth, setComponentWidth] = useState(null)
 
+	// Triggers for useEffect
+	let useEffectTriggers = [selected, onSelect, controlRef, items]
+	if (resize) {
+		useEffectTriggers = [...useEffectTriggers, componentWidth]
+	}
+
+	// region state
 	const toggle = (index: number) => {
 		// todo : check if element exists
 		const prev = selected
 		setSelected(index)
-		props.onSelect && props.onSelect(index, prev)
+		// props.onSelect && props.onSelect(index, prev, items[index])
+		onSelect && onSelect(index, prev, items[index])
 	}
+	// endregion state
 
-	const renderLabel = (index: number) => {
+	// region rendering
+	const renderItem = (index: number) => {
 		const isSelected = index === selected
+		const item = items[index]
 
 		return (
 			<div
-				key={`${Date.now()}-${index}`}
+				key={`button-${name}-${uniqid}b${index}`}
+				ref={item.ref}
 				className={`${classes.button} ${
 					isSelected ? classes.selected : ''
 				}`}
-				onClick={() => toggle(index)}
 			>
-				<div className={classes.label}>{labels[index]}</div>
+				<input
+					type="radio"
+					value={item.value}
+					id={item.label}
+					name={name}
+					onChange={() => toggle(index)}
+					checked={isSelected}
+				/>
+				<label htmlFor={item.label} className={classes.label}>
+					{item.label}
+				</label>
+				{/* <div className={classes.label}>{labels[index]}</div> */}
 			</div>
 		)
 	}
 
 	const renderSeparator = (index: number) => {
-		if (n <= 2) {
+		if (items.length <= 2) {
 			return ''
 		}
 
-		if (index >= n - 1) {
+		if (index >= items.length - 1) {
 			// last element
 			return ''
 		}
@@ -58,7 +109,7 @@ const SegmentedControls = ({ labels, ...props }: SegmentedControlsProps) => {
 
 		return (
 			<div
-				key={index}
+				key={`sep-${name}-${uniqid}s${index}`}
 				className={`${classes.separator} ${
 					!nextTo && 'bg-neutral-400'
 				}`}
@@ -66,29 +117,60 @@ const SegmentedControls = ({ labels, ...props }: SegmentedControlsProps) => {
 			></div>
 		)
 	}
+	// endregion rendering
 
-	// 2 : 118px
-	// 3 : 174px (+56)
-	// 4 : 230px (+56)
-	// 5 : 286px (+56)
-	const width = 6 + 56 * n
+	// region resizing
+	const handleResize = () => {
+		setComponentWidth(controlRef.current.offsetWidth)
+	}
+	// endregion resizing
+
+	const updateSelectedElement = () => {
+		if (!items.length) {
+			return
+		}
+
+		const activeSegmentRef = items[selected].ref
+		const { offsetWidth, offsetLeft } = activeSegmentRef.current
+		const { style } = controlRef.current
+
+		style.setProperty('--highlight-width', `${offsetWidth}px`)
+		style.setProperty('--highlight-x-pos', `${offsetLeft}px`)
+	}
+
+	useEffect(() => {
+		componentReady.current = true
+		updateSelectedElement()
+		resize && window.addEventListener('resize', handleResize)
+		return () => {
+			resize && window.removeEventListener('resize', handleResize)
+		}
+	}, [])
+
+	useEffect(() => {
+		updateSelectedElement()
+	}, [useEffectTriggers])
 
 	return (
-		<>
-			{labels.length ? (
-				<div
-					className={classes.segment}
-					style={props.style && { ...props.style }}
-				>
-					{labels.map((x, i) => (
-						<>
-							{renderLabel(i)}
-							{renderSeparator(i)}
-						</>
-					))}
-				</div>
-			) : null}
-		</>
+		<div
+			ref={controlRef}
+			className={`controls-container ${classes.container}`}
+			style={props.style && { ...props.style }}
+		>
+			<div
+				className={`controls ${classes.controls} ${classes.segment}  ${
+					componentReady.current ? 'ready' : 'idle'
+				}`}
+				style={props.style && { ...props.style }}
+			>
+				{items.map((x, i) => (
+					<React.Fragment key={`fragment-${name}-${i}`}>
+						{renderItem(i)}
+						{renderSeparator(i)}
+					</React.Fragment>
+				))}
+			</div>
+		</div>
 	)
 }
 
