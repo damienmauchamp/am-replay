@@ -3,12 +3,13 @@ import ButtonTestPage from '@/components/Tests/Pages/ButtonTestPage'
 import SegmentedControlsTestPage from '@/components/Tests/Pages/SegmentedControlsTestPage'
 import { iOSTheme } from '@/tailwind.config'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
  * @todo : useMemo / useCallback (car tous les components se regénère à chaque action)
  */
 export default function localStoragePage() {
+	const [tmp, setTmp] = useState<number>(0)
 	const [value, setValue] = useState<number>(0)
 	const [storageValue, setStorageValue] = useState<any[]>([])
 	const [inputValue, setInputValue] = useState<string>('first')
@@ -25,6 +26,7 @@ export default function localStoragePage() {
 		value: value,
 		inputValue: inputValue,
 		inputRefValue: inputRef.current?.value,
+		timestamp: Date.now(),
 	})
 
 	const onLog = () => {
@@ -56,6 +58,18 @@ export default function localStoragePage() {
 
 	const onReset = () => setStorage([])
 
+	const onIncrement = () => setValue(value + 1)
+	const onDecrement = () => setValue(value - 1)
+	const onIncrementWithCallback = useCallback(() => {
+		onIncrement()
+	}, [tmp])
+	const onDecrementWithCallback = useCallback(() => {
+		onDecrement()
+	}, [tmp])
+
+	useEffect(() => {
+		console.log('UPDATED')
+	})
 	useEffect(() => {
 		console.log('MOUNTED')
 		if (typeof window !== 'undefined') {
@@ -84,7 +98,7 @@ export default function localStoragePage() {
 					className={buttonClassNames()}
 					Style="Filled"
 					Color={iOSTheme.color.teal}
-					onClick={() => setValue(value + 1)}
+					onClick={onIncrement}
 				>
 					Increment
 				</Button>
@@ -92,10 +106,27 @@ export default function localStoragePage() {
 					className={buttonClassNames()}
 					Style="Filled"
 					Color={iOSTheme.color.purple}
-					onClick={() => setValue(value - 1)}
+					onClick={onDecrement}
 				>
 					Decrement
 				</Button>
+
+				{/* <Button
+					className={buttonClassNames()}
+					Style="Filled"
+					Color={iOSTheme.color.teal}
+					onClick={onIncrementWithCallback}
+				>
+					IncrementWithCallback
+				</Button>
+				<Button
+					className={buttonClassNames()}
+					Style="Filled"
+					Color={iOSTheme.color.purple}
+					onClick={onDecrementWithCallback}
+				>
+					DecrementWithCallback
+				</Button> */}
 
 				<Button
 					className={buttonClassNames()}

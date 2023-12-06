@@ -36,6 +36,7 @@
 }
 
 .buttonLabel {
+	@apply truncate;
 }
 
 /* Size */

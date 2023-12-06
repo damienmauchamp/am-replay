@@ -56,7 +56,9 @@ const LibraryAlbum = (props: {
 					width={defaultSize}
 					height={defaultSize}
 				/>
-				<p>ID: {props.displayedAlbumId}</p>
+				<p>
+					ID: {props.displayedAlbumId} - {props.album.id}
+				</p>
 				<p>{props.album.attributes.name}</p>
 				<p>{props.album.attributes.artistName}</p>
 				<p>{props.album.attributes.releaseDate}</p>

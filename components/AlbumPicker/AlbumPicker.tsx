@@ -10,12 +10,66 @@ import SegmentedControls from '../AppleMusic/SegmentedControls/SegmentedControls
 import styles from './AlbumPicker.module.css'
 import TopTab from './Tabs/TopTab'
 import TodoTab from './Tabs/TodoTab'
+import moment from 'moment-timezone'
 
 const log = (...args: any) => {
 	logDebug('AlbumPicker', 'teal', ...args)
 }
 
 interface AlbumPickerProps {}
+
+type YearType = {
+	albums: LibraryAlbum[]
+	picked: string[]
+	todo: string[]
+	skipped: string[]
+}
+
+// type YearsType = {
+// 	[]
+// }
+
+const DATATYPE_CODE = 'DataType'
+type DataType = {
+	// years: YearType[]
+	years: { [year: number]: YearType }
+	// todo : cache, localStorage, save before closing, button save, ...
+	// cache: {
+	// 	page: null,
+	// },
+	timestamp: number
+	lastUpdate: number
+	lastAction: string
+	type: string
+}
+
+const STORAGE_KEY = 'amrStoragePicker'
+const STORAGE_MINS = 3600
+
+const DEFAULT_YEARLY: YearType = {
+	albums: [] as LibraryAlbum[],
+	picked: [] as string[],
+	todo: [] as string[],
+	skipped: [] as string[],
+}
+
+const getDefaultState = (year: number): DataType => ({
+	years: {
+		[year]: DEFAULT_YEARLY,
+	},
+	// todo : cache, localStorage, save before closing, button save, ...
+	// cache: {
+	// 	page: null,
+	// },
+	timestamp: Date.now(),
+	lastUpdate: Date.now(),
+	lastAction: 'init',
+	type: DATATYPE_CODE,
+})
+
+const isDataType = (obj: any): obj is DataType => {
+	return obj.type === DATATYPE_CODE
+}
 
 const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	const { logged, getInstance, isAuthorized } = useMusicKitContext()
@@ -105,7 +159,12 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 				const libraryAlbums: LibraryAlbum[] = response as LibraryAlbum[]
 
 				// filtering
-				const onlyAlbums: LibraryAlbum[] = libraryAlbums.filter(
+				const currentAlbumIds = albums.map((a) => a.id)
+				console.log('currentAlbumIds', currentAlbumIds)
+				const uniqueAlbums: LibraryAlbum[] = libraryAlbums.filter(
+					(a) => !currentAlbumIds.includes(a.id)
+				)
+				const onlyAlbums: LibraryAlbum[] = uniqueAlbums.filter(
 					(a) =>
 						!String(a.attributes.name).endsWith('- Single') &&
 						!String(a.attributes.name).endsWith('- EP')
@@ -175,7 +234,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 
 	const resetPage = () => {
 		stopLoading()
-		updateAlbums([], true)
+		// updateAlbums([], true)
+		updateData(getDefaultState(year))
 		setDisplayedAlbumId(0)
 		setApiPage(1)
 	}
@@ -183,7 +243,21 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	useEffect(() => {
 		console.log(`Component AlbumPicker mounted.`)
 
-		setDisplay(logged && isAuthorized())
+		// if (getStorageData()) {
+		// 	setData(getStorageData())
+		// }
+		console.log('getStorageData', getStorageData())
+		console.log('initData', initData())
+		if (logged && isAuthorized()) {
+			const init = initData()
+			updateData(init, 'initData')
+			if (init.years[year].albums.length) {
+				console.log('go first')
+				displayFirstAlbumWithoutCategory()
+				// setAlbums(init.years[year].albums)
+			}
+			setDisplay(true)
+		}
 
 		return () => {
 			console.log(`Component AlbumPicker unmounted.`)
@@ -227,31 +301,41 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 
 	/* ------ */
 
-	const DEFAULT_YEARLY = {
-		albums: [] as LibraryAlbum[],
-		picked: [] as string[],
-		todo: [] as string[],
-		skipped: [] as string[],
+	const [data, setData] = useState(getDefaultState(year))
+
+	const getStorageData = () => {
+		const storage = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+		if (isDataType(storage)) {
+			log('[getStorageData] Storage retrieved')
+			return storage
+		}
+
+		log('[getStorageData] No storage retrieved')
+		return null
 	}
-	const DEFAULT_STATE = {
-		years: {
-			[year]: DEFAULT_YEARLY,
-		},
-		// todo : cache, localStorage, save before closing, button save, ...
-		// cache: {
-		// 	page: null,
-		// },
-		timestamp: Date.now(),
-		lastUpdate: Date.now(),
-		lastAction: 'init',
+	const setStorageData = (data: any) => {
+		console.log('setStorageData', data)
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+	}
+	const resetStorageData = () => {
+		localStorage.removeItem(STORAGE_KEY)
 	}
 
-	const [data, setData] = useState(DEFAULT_STATE)
+	const initData = () => {
+		const storage = getStorageData()
+		const isValid =
+			storage &&
+			moment().diff(moment(storage?.lastUpdate), 'minutes') < STORAGE_MINS
+		console.log('[init] isValid:', isValid, storage)
+		return isValid ? storage : getDefaultState(year)
+	}
 
 	const updateData = (newData: any, action: string = 'update') => {
 		newData.lastUpdate = Date.now()
 		newData.lastAction = action
 		setData(newData)
+		setStorageData(newData)
+		setAlbums(newData.years[year].albums)
 	}
 
 	const updateAlbums = (
@@ -264,7 +348,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		dataX.years[year].albums = tmp
 		updateData(dataX, 'albumUpdate')
 
-		setAlbums(tmp)
+		// setAlbums(tmp)
 	}
 
 	const getCurrentId = () => {
@@ -417,8 +501,16 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		}
 	}
 
-	const onAlbumDelete = (identifier: string, albumId: string) => {
-		log('callback:', identifier, albumId)
+	const onAlbumTabDelete = (identifier: string, albumId: string) => {
+		log('[onAlbumTabDelete] callback:', identifier, albumId)
+	}
+
+	const onAlbumTabTodo = (identifier: string, albumId: string) => {
+		log('[onAlbumTabTodo] callback:', identifier, albumId)
+	}
+
+	const onAlbumTabCancel = (identifier: string, albumId: string) => {
+		log('[onAlbumTabCancel] callback:', identifier, albumId)
 	}
 
 	/* ------ */
@@ -500,6 +592,11 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 						resetPage()
 					</Button>
 				</li>
+				<li>
+					<Button Style="Filled" onClick={() => resetStorageData()}>
+						resetStorage()
+					</Button>
+				</li>
 			</ul>
 		)
 	}
@@ -526,13 +623,27 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	const getNextAlbum = () => {
 		const next = albums[displayedAlbumId]
 		if (next && !albumHasCategory(next.id)) {
+			console.log('getNextAlbum.next', next)
 			return next
 		}
 
 		const nextIndex = getFirstAlbumIdWithoutCategory()
-		return nextIndex && albums[nextIndex] && !albumHasCategory(nextIndex)
+		if (
+			nextIndex !== null &&
+			albums[nextIndex] &&
+			!albumHasCategory(nextIndex)
+		) {
+			setDisplayedAlbumId(nextIndex)
+			return albums[nextIndex]
+		}
+		return false
 	}
 	const renderAlbums = () => {
+		console.log('renderAlbums albums.length:', albums.length)
+
+		getNextAlbum()
+		console.log('displayedAlbumId', displayedAlbumId)
+
 		return albums.length ? (
 			getNextAlbum() ? (
 				<>
@@ -641,7 +752,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	const renderTab = (index: number, content: React.JSX.Element) => {
 		return (
 			<div
-				className={`${styles.page} ${
+				// className={`${styles.page} ${
+				className={`${styles.tab} ${
 					(tab === index && styles.show) || ''
 				}`}
 			>
@@ -653,15 +765,20 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	const renderTabPicker = () => {
 		return (
 			<>
-				<h2>Picker</h2>
-
 				<section id="topButtons">
-					<h3>TopButtons</h3>
+					<div>
+						<h3>TopButtons</h3>
+					</div>
 					{renderTopButtons()}
 				</section>
 
-				<section className="flex justify-center" id="albumsOld">
-					<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
+				<section
+					className="flex flex-col justify-center"
+					id="albumsOld"
+				>
+					<div>
+						<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
+					</div>
 
 					<div className="max-w-sm">
 						{renderAlbums()}
@@ -690,6 +807,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 						Nb: {albums ? albums.length : 'NULL'} -{' '}
 						{albumFetching ? `Fetching page ${apiPage}...` : 'Done'}
 					</div>
+					<div>apiPage : {apiPage}</div>
 					<div>Tab : {tab}</div>
 					<Button
 						Style="Bezeled"
@@ -710,38 +828,53 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	const render = () => {
 		return (
 			<>
-				<SegmentedControls
-					controlRef={tabsRef}
-					name={'yoo'}
-					items={tabsItems}
-					selected={tab}
-					onSelect={(index, prev, item) => {
-						log('(onSelectSegment)', index, prev, item)
-						setTab(index)
-					}}
-					// style={{ width: '100%' }}
-				/>
+				<div className={styles.page}>
+					<h2>Hello</h2>
 
-				{renderTab(0, renderTabPicker())}
+					<SegmentedControls
+						controlRef={tabsRef}
+						name={'yoo'}
+						items={tabsItems}
+						selected={tab}
+						onSelect={(index, prev, item) => {
+							log('(onSelectSegment)', index, prev, item)
+							setTab(index)
+						}}
+						// style={{ width: '100%' }}
+					/>
 
-				{renderTab(
-					1,
-					<TopTab
-						identifier="picked"
-						albums={data.years[year].albums}
-						picked={data.years[year].picked}
-						onDelete={onAlbumDelete}
-					/>
-				)}
-				{renderTab(
-					2,
-					<TodoTab
-						identifier="todo"
-						albums={data.years[year].albums}
-						todo={data.years[year].todo}
-						onDelete={onAlbumDelete}
-					/>
-				)}
+					<div className="overflow-y-auto	">
+						{renderTab(0, renderTabPicker())}
+						{renderTab(
+							1,
+							<TopTab
+								identifier="picked"
+								albums={data.years[year].albums}
+								picked={data.years[year].picked}
+								//
+								canCancel={true}
+								onCancel={onAlbumTabCancel}
+								canTodo={true}
+								onTodo={onAlbumTabTodo}
+								canDelete={true}
+								onDelete={onAlbumTabDelete}
+							/>
+						)}
+						{renderTab(
+							2,
+							<TodoTab
+								identifier="todo"
+								albums={data.years[year].albums}
+								todo={data.years[year].todo}
+								//
+								canCancel={true}
+								onCancel={onAlbumTabCancel}
+								canDelete={true}
+								onDelete={onAlbumTabDelete}
+							/>
+						)}
+					</div>
+				</div>
 			</>
 		)
 	}

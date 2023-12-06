@@ -7,12 +7,18 @@ import Image from 'next/image'
 import Button from '@/components/AppleMusic/Buttons/Button'
 import { IoMdTrash } from 'react-icons/io'
 import { iOSTheme } from '@/tailwind.config'
+import { IoChevronBackCircle, IoReader } from 'react-icons/io5'
 
 export interface TabsProps {
 	identifier: string
 	albums: LibraryAlbum[]
+	//
+	canCancel?: boolean
+	onCancel?: (identifier: string, albumId: string) => void
+	canTodo?: boolean
+	onTodo?: (identifier: string, albumId: string) => void
+	canDelete?: boolean
 	onDelete?: (identifier: string, albumId: string) => void
-	// onDelete?: () => {}
 }
 
 interface AlbumPickerTabProps extends TabsProps {
@@ -21,20 +27,46 @@ interface AlbumPickerTabProps extends TabsProps {
 	albums: LibraryAlbum[]
 }
 
+const defaultCallback = (identifier: string, albumId: string) => albumId
+const defaultProps = {
+	canCancel: false,
+	onCancel: defaultCallback,
+	canTodo: false,
+	onTodo: defaultCallback,
+	canDelete: false,
+	onDelete: defaultCallback,
+}
+
 const AlbumPickerTab: React.FC<AlbumPickerTabProps> = ({
 	title,
 	list,
 	albums,
+	//
+	canCancel,
+	onCancel,
+	canTodo,
+	onTodo,
+	canDelete,
+	onDelete,
+	//
 	...props
 }) => {
+	if (!canTodo) {
+		onTodo = defaultCallback
+	}
+
+	if (!canDelete) {
+		onDelete = defaultCallback
+	}
+
 	return (
 		<>
-			<h2>renderTabTop</h2>
-
 			<section>
-				<h3>
-					{title} ({list.length})
-				</h3>
+				<div>
+					<h3>
+						{title} ({list.length})
+					</h3>
+				</div>
 
 				<ul className="flex flex-col gap-2">
 					{list.map((albumId: string) => {
@@ -72,22 +104,56 @@ const AlbumPickerTab: React.FC<AlbumPickerTabProps> = ({
 												}
 											</p>
 										</div>
-										<div className="flex items-center">
-											<Button
-												Icon={IoMdTrash}
-												Style="Filled"
-												Color={
-													iOSTheme.color.red.DEFAULT
-												}
-												title="Remove"
-												onClick={() =>
-													props.onDelete &&
-													props.onDelete(
-														props.identifier,
-														libraryAlbum.id
-													)
-												}
-											></Button>
+										<div className="flex flex-col justify-center items-center gap-1">
+											{canCancel && (
+												<Button
+													Icon={IoChevronBackCircle}
+													Style="Filled"
+													Color={
+														iOSTheme.color.purple
+													}
+													title="Cancel"
+													onClick={() =>
+														onCancel &&
+														onCancel(
+															props.identifier,
+															libraryAlbum.id
+														)
+													}
+												></Button>
+											)}
+											{canTodo && (
+												<Button
+													Icon={IoReader}
+													Style="Filled"
+													Color={
+														iOSTheme.color.yellow
+													}
+													title="Todo"
+													onClick={() =>
+														onTodo &&
+														onTodo(
+															props.identifier,
+															libraryAlbum.id
+														)
+													}
+												></Button>
+											)}
+											{canDelete && (
+												<Button
+													Icon={IoMdTrash}
+													Style="Filled"
+													Color={iOSTheme.color.grey}
+													title="Remove (skip)"
+													onClick={() =>
+														onDelete &&
+														onDelete(
+															props.identifier,
+															libraryAlbum.id
+														)
+													}
+												></Button>
+											)}
 										</div>
 									</div>
 								</li>
@@ -100,8 +166,6 @@ const AlbumPickerTab: React.FC<AlbumPickerTabProps> = ({
 	)
 }
 
-AlbumPickerTab.defaultProps = {
-	onDelete: (albumId: string) => albumId,
-}
+AlbumPickerTab.defaultProps = defaultProps
 
 export default AlbumPickerTab

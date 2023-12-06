@@ -70,13 +70,14 @@ const defaultProps: ButtonProps = {
 	// LabelType: ButtonLabelType.Text,
 }
 
-const Button = ({
+const ButtonComponent = ({
 	children,
 	Icon,
 	OnMaterialState,
 	LabelType,
 	Color,
 	Style,
+	Size,
 	textStyle,
 	iconStyle,
 	ref,
@@ -84,7 +85,7 @@ const Button = ({
 }: ButtonProps) => {
 	const debug = () => {
 		console.log('[Button] debug:', {
-			Size: props.Size,
+			Size: Size,
 			'classes.button': classes.button,
 		})
 	}
@@ -114,7 +115,6 @@ const Button = ({
 	const buttonStyle = () => {
 		let style = {}
 
-		console.log('Color', Color, getColor(Color))
 		if (getColor(Color)) {
 			if (Style === ButtonStyle.Bezeled && !props.disabled) {
 				style = {
@@ -161,7 +161,7 @@ const Button = ({
 				className={`
 				${props.className || ''} 
 				${classes.button} 
-				${classes['button' + props.Size]}
+				${classes['button' + Size]}
 				${classes['button' + Style]}
 				${classes['button' + LabelType]}
 				${classes['buttonState' + (!props.disabled ? 'Enabled' : 'Disabled')]}
@@ -187,7 +187,7 @@ const Button = ({
 				)}
 				{LabelType !== ButtonLabelType.Symbol ? (
 					<div
-						className="buttonLabel"
+						className={classes.buttonLabel}
 						style={{
 							...buttonElementsStyle(),
 							...textStyle,
@@ -203,7 +203,7 @@ const Button = ({
 	)
 }
 
-Button.defaultProps = defaultProps
+ButtonComponent.defaultProps = defaultProps
 
 const ButtonWithRef = forwardRef(
 	(props: ButtonProps, ref: ForwardedRef<HTMLButtonElement>) => (
@@ -211,5 +211,10 @@ const ButtonWithRef = forwardRef(
 	)
 )
 
-export default ButtonWithRef
-// export default Button
+export const Button = ButtonComponent
+export default Button
+// export default React.memo(ButtonWithRef)
+// export default React.memo(ButtonWithRef)
+export const ButtonMemo = React.memo(ButtonWithRef)
+export const ButtonWithoutRef = Button
+export const ButtonMemoWithoutRef = React.memo(Button)
