@@ -1,0 +1,21 @@
+.page {
+	@apply grid py-4 gap-4 w-full;
+}
+
+.page > h2 {
+	@apply font-bold text-xl;
+	@apply border-b pb-1;
+}
+
+.page:not(.show) {
+	@apply hidden;
+}
+
+.page section {
+	@apply px-2 pb-2;
+}
+
+.page section > h3 {
+	@apply font-bold text-lg;
+	@apply border-b pb-1;
+}
