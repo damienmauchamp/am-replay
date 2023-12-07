@@ -2,14 +2,22 @@ import React from 'react'
 import { IoPauseSharp, IoPlaySharp } from 'react-icons/io5'
 import Button from '../../AppleMusic/Buttons/Button'
 import { testButtons } from '@/helpers/tests/buttonsTests'
+import Head from 'next/head'
 
 export default function ButtonTestPage() {
 	return (
 		<>
+			<Head>
+				<title>Test Page : Buttons</title>
+				<meta
+					property="og:title"
+					content="Test Page : Buttons"
+					key="title"
+				/>
+			</Head>
 			<Button Style="Filled" className="w-[50px]" key={'coucou'}>
 				Coucou
 			</Button>
-
 			<Button
 				Size="Medium"
 				Style="Bezeled"
@@ -33,7 +41,6 @@ export default function ButtonTestPage() {
 			>
 				Pause
 			</Button>
-
 			<div className={'grid grid-cols-3 gap-2 p-4 bg-[#ccc]'}>
 				{testButtons().map((buttonType) => {
 					const newCollection = [

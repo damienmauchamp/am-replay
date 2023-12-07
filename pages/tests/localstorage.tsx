@@ -1,6 +1,7 @@
 import Button from '@/components/AppleMusic/Buttons/Button'
 import ButtonTestPage from '@/components/Tests/Pages/ButtonTestPage'
 import SegmentedControlsTestPage from '@/components/Tests/Pages/SegmentedControlsTestPage'
+import TestsNavLinks from '@/components/Tests/TestsNavLinks'
 import { iOSTheme } from '@/tailwind.config'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -82,36 +83,40 @@ export default function localStoragePage() {
 
 	const buttonClassNames = () => '!w-auto'
 	return (
-		<div className="flex flex-col w-full my-24 mx-auto h-500 p-4 items-center justify-center">
-			<div>Value : {value}</div>
+		<>
+			<TestsNavLinks />
+			<div className="flex flex-col w-full my-24 mx-auto h-500 p-4 items-center justify-center">
+				<div>Value : {value}</div>
 
-			<input
-				ref={inputRef}
-				type="text"
-				value={inputValue}
-				// onInput={(e) => setInputValue(e.target.value)}
-				onInput={(e) => setInputValue(inputRef.current?.value || '')}
-			/>
+				<input
+					ref={inputRef}
+					type="text"
+					value={inputValue}
+					// onInput={(e) => setInputValue(e.target.value)}
+					onInput={(e) =>
+						setInputValue(inputRef.current?.value || '')
+					}
+				/>
 
-			<div className="grid grid-cols-2 gap-4 p-2">
-				<Button
-					className={buttonClassNames()}
-					Style="Filled"
-					Color={iOSTheme.color.teal}
-					onClick={onIncrement}
-				>
-					Increment
-				</Button>
-				<Button
-					className={buttonClassNames()}
-					Style="Filled"
-					Color={iOSTheme.color.purple}
-					onClick={onDecrement}
-				>
-					Decrement
-				</Button>
+				<div className="grid grid-cols-2 gap-4 p-2">
+					<Button
+						className={buttonClassNames()}
+						Style="Filled"
+						Color={iOSTheme.color.teal}
+						onClick={onIncrement}
+					>
+						Increment
+					</Button>
+					<Button
+						className={buttonClassNames()}
+						Style="Filled"
+						Color={iOSTheme.color.purple}
+						onClick={onDecrement}
+					>
+						Decrement
+					</Button>
 
-				{/* <Button
+					{/* <Button
 					className={buttonClassNames()}
 					Style="Filled"
 					Color={iOSTheme.color.teal}
@@ -128,38 +133,39 @@ export default function localStoragePage() {
 					DecrementWithCallback
 				</Button> */}
 
-				<Button
-					className={buttonClassNames()}
-					Style="Filled"
-					Color={iOSTheme.color.green}
-					onClick={onSave}
-				>
-					Save
-				</Button>
+					<Button
+						className={buttonClassNames()}
+						Style="Filled"
+						Color={iOSTheme.color.green}
+						onClick={onSave}
+					>
+						Save
+					</Button>
 
-				<Button
-					className={buttonClassNames()}
-					Style="Filled"
-					Color={iOSTheme.color.red}
-					onClick={onReset}
-				>
-					Reset
-				</Button>
+					<Button
+						className={buttonClassNames()}
+						Style="Filled"
+						Color={iOSTheme.color.red}
+						onClick={onReset}
+					>
+						Reset
+					</Button>
 
-				<Button
-					className={buttonClassNames()}
-					Style="Filled"
-					Color={iOSTheme.color.gray4.dark}
-					onClick={onLog}
-				>
-					Log
-				</Button>
+					<Button
+						className={buttonClassNames()}
+						Style="Filled"
+						Color={iOSTheme.color.gray4.dark}
+						onClick={onLog}
+					>
+						Log
+					</Button>
+				</div>
+
+				<pre className="whitespace-wrap whitespace-break-spaces overflow-hidden  break-words max-w-full text-xs">
+					{JSON.stringify(storageValue)}
+				</pre>
+				{/* <pre className="">{JSON.stringify(getStorage())}</pre> */}
 			</div>
-
-			<pre className="whitespace-wrap whitespace-break-spaces overflow-hidden  break-words max-w-full text-xs">
-				{JSON.stringify(storageValue)}
-			</pre>
-			{/* <pre className="">{JSON.stringify(getStorage())}</pre> */}
-		</div>
+		</>
 	)
 }

@@ -8,6 +8,7 @@ import {
 	MusicKitContextProvider,
 	useMusicKitContext,
 } from '@/context/MusicKitContext'
+import TestsNavLinks from '@/components/Tests/TestsNavLinks'
 
 const log = (...args: any) => {
 	logDebug('index', 'cyan', ...args)
@@ -27,6 +28,9 @@ const Landing: NextPage<{}> = () => {
 				<main className={`flex flex-col items-center p-4`}>
 					<Home />
 				</main>
+				<footer>
+					<TestsNavLinks />
+				</footer>
 			</>
 		</MusicKitContextProvider>
 	)
