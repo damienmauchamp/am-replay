@@ -159,7 +159,10 @@ export default function NavBarTest({
 						>
 							{back && (
 								<>
-									<IoChevronBackOutline size={28} />
+									<IoChevronBackOutline
+										size={28}
+										className="shrink-0"
+									/>
 									<div
 										className={
 											styles.uiSmallTitleButtonLabel
@@ -174,7 +177,7 @@ export default function NavBarTest({
 						<div
 							ref={smallTitleRef}
 							style={{ opacity: Number(smallTitleVisible) }}
-							className={`${styles.titleTransition} ${styles.uiSmallTitle}`}
+							className={styles.uiSmallTitle}
 						>
 							{title}
 						</div>
@@ -207,7 +210,7 @@ export default function NavBarTest({
 									opacity: Number(largeTitleVisible),
 								}}
 								// className="w-full px-4 pt-[3px] pb-2 text-black text-[34px] font-bold leading-[41px] truncate"
-								className={`${styles.titleTransition} w-full px-5 pt-[3px] text-[34px] font-bold leading-[41px] truncate`}
+								className={styles.uiLargeTitle}
 							>
 								{title}
 							</div>
