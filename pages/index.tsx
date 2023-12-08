@@ -9,6 +9,7 @@ import {
 	useMusicKitContext,
 } from '@/context/MusicKitContext'
 import TestsNavLinks from '@/components/Tests/TestsNavLinks'
+import Head from 'next/head'
 
 const log = (...args: any) => {
 	logDebug('index', 'cyan', ...args)
@@ -21,6 +22,11 @@ const Landing: NextPage<{}> = () => {
 	return (
 		<MusicKitContextProvider>
 			<>
+				<Head>
+					{/* Title */}
+					<title>AMReplay</title>
+					<meta property="og:title" content="AMReplay" key="title" />
+				</Head>
 				<header>
 					<Nav />
 				</header>

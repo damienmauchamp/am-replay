@@ -14,6 +14,7 @@ export default function navbar() {
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>(
 		'Rechercher dans les playlists'
 	)
+	const [speechToText, setSpeechToText] = useState<boolean>(true)
 
 	const renderTests = () => (
 		<>
@@ -34,6 +35,13 @@ export default function navbar() {
 
 					<Button Style="Filled" onClick={() => setScrollX(!scrollX)}>
 						ScrollX : {Number(scrollX)}
+					</Button>
+
+					<Button
+						Style="Filled"
+						onClick={() => setSpeechToText(!speechToText)}
+					>
+						SpeechToText : {Number(speechToText)}
 					</Button>
 
 					<div>
@@ -94,6 +102,7 @@ export default function navbar() {
 					wrappedIcon ? IoReorderThreeOutline : IoVideocamOutline
 				}
 				topIconWrapped={wrappedIcon}
+				speechToText={speechToText}
 			>
 				{renderTests()}
 			</NavBarTest>

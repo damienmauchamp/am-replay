@@ -21,10 +21,6 @@ export default function Document() {
 				/>
 				<link rel="apple-touch-icon" href="/logo192.png" />
 				<link rel="manifest" href="/manifest.json" />
-
-				{/* Title */}
-				<title>AMReplay</title>
-				<meta property="og:title" content="AMReplay" key="title" />
 			</Head>
 			<body>
 				<Main />

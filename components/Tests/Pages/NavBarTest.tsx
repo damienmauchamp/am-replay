@@ -2,6 +2,10 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { IoChevronBackOutline, IoMic, IoSearch } from 'react-icons/io5'
 import TestsNavLinks from '../TestsNavLinks'
 import styles from './NavBarTest.module.css'
+import 'regenerator-runtime/runtime'
+import SpeechRecognition, {
+	useSpeechRecognition,
+} from 'react-speech-recognition'
 
 /**
  * @property {boolean} faded fade BG
@@ -17,6 +21,7 @@ type Props = {
 	//
 	search?: boolean
 	searchPlaceholder?: string
+	speechToText?: boolean
 	//
 	scrollX?: boolean
 
@@ -27,14 +32,13 @@ type Props = {
 
 const defaultProps: Props = {
 	searchPlaceholder: 'Search',
+	speechToText: true,
 	faded: true,
 	// scrollX: true,
 	// onTopIconClick: () => void
 }
 
-NavBarTest.defaultProps = defaultProps
-
-export default function NavBarTest({
+const NavBarTest = ({
 	children,
 	title,
 	back,
@@ -45,8 +49,11 @@ export default function NavBarTest({
 	faded,
 	search,
 	searchPlaceholder,
+	speechToText,
 	...props
-}: Props) {
+}: Props) => {
+	// region Titles toggling
+
 	// small title
 	// todo : useRef / getBound
 	const titleSwitchScroll = 32
@@ -54,15 +61,9 @@ export default function NavBarTest({
 	const [smallTitleVisible, setSmallTitleVisible] = useState<boolean>(false)
 
 	// large title
-	// const largeTitleMaxHeight = 52
 	const largeTitleRef = useRef<HTMLDivElement>(null)
 	const [largeTitleVisible, setLargeTitleVisible] = useState<boolean>(true)
-
 	const topRef = useRef<HTMLDivElement>(null)
-
-	//
-	const [searchBarIsFixed, setSearchBarIsFixed] = useState<boolean>(false)
-	const searchBarRef = useRef<HTMLDivElement>(null)
 
 	// scroll
 	const [scrollY, setScrollY] = useState<number>(0)
@@ -114,30 +115,91 @@ export default function NavBarTest({
 			window.removeEventListener('scroll', handleScroll)
 		}
 	}, [])
+	// endregion Titles toggling
+
+	// region SearchBar
+	const defaultSearchText = searchPlaceholder || 'Search' // = ''
+	const [searchbarText, setSearchBarText] = useState<string>(
+		searchPlaceholder || 'Search'
+	)
+	const [searchBarIsFixed, setSearchBarIsFixed] = useState<boolean>(false)
+	const searchBarRef = useRef<HTMLDivElement>(null)
+	// endregion SearchBar
+
+	// region SpeechToText
+	if (speechToText === undefined) {
+		speechToText = true
+	}
+
+	const {
+		transcript,
+		browserSupportsSpeechRecognition,
+		isMicrophoneAvailable,
+	} = useSpeechRecognition()
+
+	const [speechToTextEnabled, setSpeechToTextEnabled] =
+		useState<boolean>(speechToText)
+	const [speechToTextIsListening, setSpeechToTextIsListening] =
+		useState<boolean>(false)
+
+	const startListening = (e: Event) => {
+		console.log('startListening')
+		if (!isMicrophoneAvailable || !speechToTextEnabled) {
+			// todo
+			console.error('Mic not available')
+			return
+		}
+		setSpeechToTextIsListening(true)
+		SpeechRecognition.startListening()
+	}
+	const stopListening = (e: Event) => {
+		console.log('stopListening')
+		setSpeechToTextIsListening(false)
+		SpeechRecognition.stopListening()
+		updateSearchText(transcript)
+	}
+
+	const updateSearchText = (text: string) =>
+		setSearchBarText(text || defaultSearchText)
 
 	useEffect(() => {
-		console.log('smallTitleRef', smallTitleRef)
+		if (!browserSupportsSpeechRecognition) {
+			setSpeechToTextEnabled(false)
+		}
 	}, [])
+	useEffect(() => {
+		if (speechToText !== undefined) {
+			setSpeechToTextEnabled(speechToText)
+		}
+	}, [speechToText])
+	useEffect(() => {
+		updateSearchText(transcript)
+	}, [transcript])
 
-	/**
-	 * wrapped icons
-	 */
-	const renderTopRightIcon = () =>
-		TopIcon && (
-			<div className="justify-start items-start gap-2.5 flex">
-				<div
-					className={`${styles.uiTopRightIcon} ${
-						(topIconWrapped && styles.uiTopRightIconWrapped) || ''
-					}`}
-					onClick={onTopIconClick}
-				>
-					<TopIcon size={topIconWrapped ? 20 : 30} />
-				</div>
-			</div>
-		)
+	// endregion SpeechToText
 
-	const iOSLarge = () => (
+	// region Wrapped icon
+	const renderTopRightIcon = () => (
 		<>
+			<div className="justify-start items-start gap-2.5 flex">
+				{TopIcon && (
+					<div
+						className={`${styles.uiTopRightIcon} ${
+							(topIconWrapped && styles.uiTopRightIconWrapped) ||
+							''
+						}`}
+						onClick={onTopIconClick}
+					>
+						<TopIcon size={topIconWrapped ? 20 : 30} />
+					</div>
+				)}
+			</div>
+		</>
+	)
+	// endregion Wrapped icon
+
+	return (
+		<div className="w-full h-[100vh] flex" style={{}}>
 			<div
 				id="main"
 				className={styles.uiMain}
@@ -182,7 +244,6 @@ export default function NavBarTest({
 							{title}
 						</div>
 
-						{/* <div className="px-4 py-[11px] justify-end items-center gap-4 inline-flex"> */}
 						<div className={styles.uiRightIcon}>
 							{renderTopRightIcon()}
 						</div>
@@ -229,10 +290,38 @@ export default function NavBarTest({
 										<IoSearch size={18} />
 									</div>
 									<div className="grow shrink basis-0 h-[22px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug truncate">
-										{searchPlaceholder}
+										{searchbarText}
 									</div>
 									<div className="text-center text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-										<IoMic size={18} />
+										<div>
+											{(speechToTextEnabled && (
+												<IoMic
+													size={18}
+													// data-enabled={Number(
+													// 	speechToText
+													// )}
+													className={`${
+														styles.uiSearchBarSpeechToText
+													} ${
+														speechToTextIsListening
+															? 'text-green'
+															: ''
+													}`}
+													onClick={(e: Event) =>
+														speechToTextEnabled
+															? speechToTextIsListening
+																? stopListening(
+																		e
+																  )
+																: startListening(
+																		e
+																  )
+															: {}
+													}
+												/>
+											)) ||
+												''}
+										</div>
 									</div>
 								</div>
 							</div>
@@ -253,15 +342,28 @@ export default function NavBarTest({
 
 								<div
 									className={`w-full border-t 
-							${false ? 'bg-red' : ''}
-							${false ? 'min-h-[999px]' : ''}
-							${true ? 'min-w-[999px]' : ''}
-							`}
+						${false ? 'bg-red' : ''}
+						${false ? 'min-h-[999px]' : ''}
+						${true ? 'min-w-[999px]' : ''}
+						`}
 								>
 									<p>content / scrollY : {scrollY}</p>
 									<p>
 										searchBarIsFixed:{' '}
 										{Number(searchBarIsFixed)}
+									</p>
+									<p>transcript : {transcript}</p>
+									<p>
+										speechToText :{' '}
+										{speechToText !== undefined
+											? Number(speechToText)
+											: 'undefined'}
+									</p>
+									<p>
+										speechToTextEnabled :{' '}
+										{speechToTextEnabled !== undefined
+											? Number(speechToTextEnabled)
+											: 'undefined'}
 									</p>
 									<div className="my-96"></div>
 									<div className="my-96"></div>
@@ -272,12 +374,10 @@ export default function NavBarTest({
 					</div>
 				</div>
 			</div>
-		</>
-	)
-
-	return (
-		<div className="w-full h-[100vh] flex" style={{}}>
-			{iOSLarge()}
 		</div>
 	)
 }
+
+NavBarTest.defaultProps = defaultProps
+
+export default NavBarTest
