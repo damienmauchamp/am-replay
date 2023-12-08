@@ -29,7 +29,11 @@ body {
 		)
 		rgb(var(--background-start-rgb));
 	font-family:
+		-apple-system,
+		BlinkMacSystemFont,
+		Apple Color Emoji,
 		SF Pro,
+		SF Pro Icons,
 		Helvetica Neue,
 		Helvetica,
 		Arial,
