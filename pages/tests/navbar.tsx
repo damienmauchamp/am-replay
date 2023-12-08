@@ -8,7 +8,7 @@ import { IoReorderThreeOutline, IoVideocamOutline } from 'react-icons/io5'
 export default function navbar() {
 	const [wrappedIcon, setWrappedIcon] = useState<boolean>(false)
 	const [search, setSearch] = useState<boolean>(true)
-	const [scrollX, setScrollX] = useState<boolean>(true)
+	const [scrollX, setScrollX] = useState<boolean>(false)
 	const [title, setTitle] = useState<string>('Playlists')
 	const [back, setBack] = useState<string>('Retour')
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>(
