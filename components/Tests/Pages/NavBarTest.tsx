@@ -1,87 +1,111 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { IoChevronBackOutline, IoMic, IoSearch } from 'react-icons/io5'
 import TestsNavLinks from '../TestsNavLinks'
+import styles from './NavBarTest.module.css'
 
-type Props = {}
+/**
+ * @property {boolean} faded fade BG
+ */
+type Props = {
+	children?: ReactNode
+	//
+	title?: string
+	back?: string
+	onBack?: React.MouseEventHandler<HTMLButtonElement>
+	//
+	faded?: boolean
+	//
+	search?: boolean
+	searchPlaceholder?: string
+	//
+	scrollX?: boolean
 
-export default function NavBarTest({}: Props) {
-	const iOSDefaultLarge = () => (
-		<div className="w-[393px] h-[175px] bg-white bg-opacity-75 border-b border-black border-opacity-30 backdrop-blur-[50px] flex-col justify-start items-center inline-flex">
-			<div className="px-[9.50px] py-[11px] justify-start items-start gap-[3px] inline-flex">
-				<div className="w-[5px] h-[5px] bg-white bg-opacity-40 rounded-full"></div>
-				<div className="w-[5px] h-[5px] bg-white bg-opacity-40 rounded-full"></div>
-				<div className="w-[5px] h-[5px] bg-white bg-opacity-40 rounded-full"></div>
-			</div>
-			<div className="w-[393px] h-11 relative">
-				<div className="px-2 py-[11px] left-0 top-0 absolute justify-start items-center gap-[3px] inline-flex">
-					<div className="text-center text-blue-600 text-[17px] leading-snug">
-						<IoChevronBackOutline />
-					</div>
-					<div className="text-blue-600 text-[17px] font-normal leading-snug">
-						Label
-					</div>
-				</div>
-				<div className="pr-4 py-[11px] left-[352px] top-0 absolute justify-end items-center gap-4 inline-flex">
-					<div className="justify-start items-start gap-2.5 flex">
-						<div className="text-right text-blue-600 text-[17px] font-normal leading-snug">
-							􀓔
-						</div>
-					</div>
-				</div>
-			</div>
-			<div className="self-stretch h-[52px] px-4 pt-[3px] pb-2 flex-col justify-start items-start gap-2.5 flex">
-				<div className="text-black text-[34px] font-bold leading-[41px]">
-					Title
-				</div>
-			</div>
-			<div className="self-stretch h-[52px] px-4 pt-px pb-[15px] flex-col justify-start items-start flex">
-				<div className="self-stretch px-2 py-[7px] bg-zinc-500 bg-opacity-10 rounded-[10px] justify-start items-center inline-flex">
-					<div className="w-[25px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-						<IoSearch />
-					</div>
-					<div className="grow shrink basis-0 h-[22px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-						Search
-					</div>
-					<div className="text-center text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-						<IoMic />
-					</div>
-				</div>
-			</div>
-		</div>
-	)
+	TopIcon?: React.ElementType
+	topIconWrapped?: boolean
+	onTopIconClick?: React.MouseEventHandler<HTMLDivElement>
+}
 
-	const back = 'Label'
-	// const title = 'Bibliothèquexwdsdsdsdq  dqsd qsd '
-	const title = 'Playlists'
+const defaultProps: Props = {
+	searchPlaceholder: 'Search',
+	faded: true,
+	// scrollX: true,
+	// onTopIconClick: () => void
+}
 
+NavBarTest.defaultProps = defaultProps
+
+export default function NavBarTest({
+	children,
+	title,
+	back,
+	TopIcon,
+	topIconWrapped,
+	onTopIconClick,
+	onBack,
+	faded,
+	search,
+	searchPlaceholder,
+	...props
+}: Props) {
 	// small title
-	const titleSwitchScroll = 52
-	const smallTitleRef = useRef(null)
+	// todo : useRef / getBound
+	const titleSwitchScroll = 32
+	const smallTitleRef = useRef<HTMLDivElement>(null)
 	const [smallTitleVisible, setSmallTitleVisible] = useState<boolean>(false)
 
 	// large title
-	const largeTitleMaxHeight = 52
-	const largeTitleRef = useRef(null)
+	// const largeTitleMaxHeight = 52
+	const largeTitleRef = useRef<HTMLDivElement>(null)
 	const [largeTitleVisible, setLargeTitleVisible] = useState<boolean>(true)
-	const [largeTitleHeight, setLargeTitleHeight] = useState<string | number>(
-		'auto'
-	)
 
-	/**
-	 * @todo : en gros c'est la searchbar qui à partir d'un moment doit être sticky en haut, le largeTitle scroll avec le tout
-	 */
+	const topRef = useRef<HTMLDivElement>(null)
+
+	//
+	const [searchBarIsFixed, setSearchBarIsFixed] = useState<boolean>(false)
+	const searchBarRef = useRef<HTMLDivElement>(null)
+
+	// scroll
+	const [scrollY, setScrollY] = useState<number>(0)
+
+	const toggleSearchBarFixation = () => {
+		if (!search) {
+			return
+		}
+		const topBarInfo = topRef.current?.getBoundingClientRect()
+		if (!topBarInfo) {
+			console.error('NO topBarInfo')
+			return
+		}
+
+		// fixing searchbar
+		const topBarBottom = topBarInfo.top + topBarInfo.height
+		const searchBarShouldBeFixed = topBarBottom <= window.scrollY
+
+		// fix for the clipping title
+		const titleGap = 5
+		if (largeTitleRef.current) {
+			if (
+				topBarBottom <= window.scrollY + titleGap &&
+				window.scrollY > titleSwitchScroll
+			) {
+				largeTitleRef.current.style.visibility = 'hidden'
+			} else {
+				largeTitleRef.current.style.visibility = 'visible'
+			}
+		}
+		// setSearchBarIsFixed(true)
+		setSearchBarIsFixed(searchBarShouldBeFixed)
+	}
 	useEffect(() => {
 		const handleScroll = () => {
-			// small title visible
+			setScrollY(window.scrollY)
+
+			// titles visibility
 			setSmallTitleVisible(window.scrollY > titleSwitchScroll)
 			setLargeTitleVisible(window.scrollY <= titleSwitchScroll)
 
-			if (window.scrollY <= 0) {
-				setLargeTitleHeight('auto')
-			} else {
-				const w = largeTitleMaxHeight - window.scrollY
-				setLargeTitleHeight(w > 0 ? w : 0)
-			}
+			//
+			toggleSearchBarFixation()
 		}
 		window.addEventListener('scroll', handleScroll)
 		handleScroll()
@@ -95,104 +119,153 @@ export default function NavBarTest({}: Props) {
 		console.log('smallTitleRef', smallTitleRef)
 	}, [])
 
+	/**
+	 * wrapped icons
+	 */
+	const renderTopRightIcon = () =>
+		TopIcon && (
+			<div className="justify-start items-start gap-2.5 flex">
+				<div
+					className={`${styles.uiTopRightIcon} ${
+						(topIconWrapped && styles.uiTopRightIconWrapped) || ''
+					}`}
+					onClick={onTopIconClick}
+				>
+					<TopIcon size={topIconWrapped ? 20 : 30} />
+				</div>
+			</div>
+		)
+
 	const iOSLarge = () => (
 		<>
 			<div
-				className="sticky top-0 z-50 w-full"
-				style={{
-					gridArea: 'nav-header',
-				}}
+				id="main"
+				className={styles.uiMain}
+				data-fixed={Number(searchBarIsFixed)}
+				data-backdrop={Number(faded)}
+				data-search={Number(search)}
 			>
-				<div className="w-full  bg-white bg-opacity-75 border-b border-black border-opacity-30 backdrop-blur-[50px] flex-col justify-start items-center inline-flex">
-					{/* Top */}
-					<div className="w-full h-11 relative flex items-center justify-between">
-						<div className="px-2 py-[11px] justify-start items-center gap-[3px] inline-flex">
-							<div className="text-center text-blue-600 text-[17px] leading-snug">
-								<IoChevronBackOutline />
-							</div>
-							<div className="text-blue-600 text-[17px] font-normal leading-snug">
-								{back}
-							</div>
-						</div>
+				<div
+					id="uiTop"
+					ref={topRef}
+					className={styles.uiTop}
+					data-visible={Number(smallTitleVisible)}
+				>
+					{/* Topbar */}
+					<div className={styles.uiSmallTitleContainer}>
+						<button
+							className={styles.uiSmallTitleButton}
+							onClick={onBack}
+						>
+							{back && (
+								<>
+									<IoChevronBackOutline size={28} />
+									<div
+										className={
+											styles.uiSmallTitleButtonLabel
+										}
+									>
+										{back}
+									</div>
+								</>
+							)}
+						</button>
 
 						<div
 							ref={smallTitleRef}
-							style={{
-								opacity: smallTitleVisible ? 1 : 0,
-								transition: 'opacity 0.3s ease',
-							}}
-							className={`text-center text-black text-[17px] leading-snug font-bold items-center justify-center truncate`}
+							style={{ opacity: Number(smallTitleVisible) }}
+							className={`${styles.titleTransition} ${styles.uiSmallTitle}`}
 						>
 							{title}
 						</div>
 
-						<div className="px-4 py-[11px] justify-end items-center gap-4 inline-flex">
-							<div className="justify-start items-start gap-2.5 flex">
-								<div className="text-right text-blue-600 text-[17px] font-normal leading-snug">
-									􀓔
-								</div>
-							</div>
+						{/* <div className="px-4 py-[11px] justify-end items-center gap-4 inline-flex"> */}
+						<div className={styles.uiRightIcon}>
+							{renderTopRightIcon()}
 						</div>
 					</div>
+				</div>
 
-					<div className="self-stretch">
+				{/* Screen */}
+				<div id="uiBottom" className={styles.uiBottom}>
+					<div
+						id="uiBottomTop"
+						data-fixed={Number(searchBarIsFixed)}
+						className={styles.uiBottomTop}
+					>
 						{/* Large title */}
 						{/* h-[52px] */}
 						<div
 							id="largeTitle"
 							// className="self-stretch   flex-col justify-start items-start gap-2.5 flex "
 							className="self-stretch gap-2.5 flex flex-col justify-start items-start overflow-hidden"
-							style={{
-								height: largeTitleHeight,
-							}}
+							style={{}}
 						>
 							<div
 								ref={largeTitleRef}
 								style={{
-									opacity: largeTitleVisible ? 1 : 0,
-									transition: 'opacity 0.3s ease',
+									opacity: Number(largeTitleVisible),
 								}}
 								// className="w-full px-4 pt-[3px] pb-2 text-black text-[34px] font-bold leading-[41px] truncate"
-								className="w-full px-4 pt-[3px] text-black text-[34px] font-bold leading-[41px] truncate"
+								className={`${styles.titleTransition} w-full px-5 pt-[3px] text-[34px] font-bold leading-[41px] truncate`}
 							>
 								{title}
 							</div>
 						</div>
 
 						{/* Search bar */}
-						<div className="self-stretch px-4 pt-2 pb-[15px] flex-col justify-start items-start flex border-b">
-							{/* <div className="self-stretch h-[52px] px-4 pt-px pb-[15px] flex-col justify-start items-start flex border-b"> */}
-							<div className="self-stretch px-2 py-[7px] bg-zinc-500 bg-opacity-10 rounded-[10px] justify-start items-center inline-flex">
-								<div className="w-[25px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-									<IoSearch />
-								</div>
-								<div className="grow shrink basis-0 h-[22px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-									Search
-								</div>
-								<div className="text-center text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-									<IoMic />
+						{search && (
+							<div
+								id="searchbar"
+								ref={searchBarRef}
+								data-fixed={Number(searchBarIsFixed)}
+								className={styles.searchbar}
+							>
+								<div className="self-stretch px-2 py-[7px] bg-zinc-500 bg-opacity-10 rounded-[10px] justify-start items-center inline-flex">
+									<div className="w-[25px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
+										<IoSearch size={18} />
+									</div>
+									<div className="grow shrink basis-0 h-[22px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug truncate">
+										{searchPlaceholder}
+									</div>
+									<div className="text-center text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
+										<IoMic size={18} />
+									</div>
 								</div>
 							</div>
-						</div>
+						)}
 					</div>
-				</div>
-			</div>
 
-			{/* Scroll content */}
-			<div
-				id="content"
-				className="flex w-full text-black font-normal bg-gray "
-				style={{
-					gridArea: 'nav-content',
-				}}
-			>
-				<div className="overflow-auto">
-					<div className={`w-full min-h-[999px] bg-red`}>
-						content
-						<br />
-						<br />
-						<br />
-						<TestsNavLinks />
+					{/* Scroll content */}
+					<div
+						id="content"
+						className={`${styles.content} ${
+							props.scrollX ? '' : styles.noScrollX
+						}`}
+					>
+						{children}
+						{true && (
+							<div className="flex flex-col gap-4 mt-4 ">
+								<TestsNavLinks />
+
+								<div
+									className={`w-full border-t 
+							${false ? 'bg-red' : ''}
+							${false ? 'min-h-[999px]' : ''}
+							${true ? 'min-w-[999px]' : ''}
+							`}
+								>
+									<p>content / scrollY : {scrollY}</p>
+									<p>
+										searchBarIsFixed:{' '}
+										{Number(searchBarIsFixed)}
+									</p>
+									<div className="my-96"></div>
+									<div className="my-96"></div>
+									<p>Foot</p>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
@@ -200,21 +273,8 @@ export default function NavBarTest({}: Props) {
 	)
 
 	return (
-		<>
-			{/* <div className={`w-full min-h-[999px] min-h-[100vh] bg-white `}> */}
-			{/* <div className="w-full h-[100vh] grid sticky top-0 bottom-0 bg-blue "> */}
-			<div
-				className="w-full h-[100vh] grid  bg-blue "
-				style={{
-					gridTemplateAreas: '"nav-header" "nav-content"',
-					gridTemplateColumns: 'minmax(0,1fr)',
-					// gridTemplateRows: '45px auto 1fr auto',
-				}}
-			>
-				{iOSLarge()}
-			</div>
-			{/* <div>{iOSDefaultLarge()}</div> */}
-			{/* </div> */}
-		</>
+		<div className="w-full h-[100vh] flex" style={{}}>
+			{iOSLarge()}
+		</div>
 	)
 }

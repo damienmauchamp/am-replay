@@ -1,0 +1,167 @@
+/**/
+
+/* Background */
+.contentBackground {
+	@apply bg-white dark:bg-black;
+}
+.contentText {
+	@apply text-black dark:text-white;
+}
+
+/* Backdrop & opacity */
+.barBackdrop {
+	@apply backdrop-blur-[50px];
+	@apply dark:bg-[#222];
+}
+.barOpacity {
+	@apply bg-opacity-75 dark:bg-opacity-50;
+}
+
+/* Utils */
+.titleTransition {
+	transition: opacity 0.3s ease;
+}
+.stickTop {
+	@apply sticky top-0;
+}
+.noScrollX {
+	@apply !overflow-x-hidden;
+}
+.noScrollY {
+	@apply !overflow-y-hidden;
+}
+.defaultPaddingX {
+	/* todo : global variable */
+	@apply px-5;
+}
+.defaultPaddingY {
+	/* todo : global variable */
+	@apply py-5;
+}
+.borderBottom {
+	/* todo : make default colors */
+	@apply border-grey3 dark:border-[#333];
+	@apply border-b border-opacity-50;
+}
+
+/* UIMain */
+
+.uiMain {
+	@apply stickTop z-50;
+	@apply w-full h-full;
+	@apply flex flex-col;
+	@apply contentBackground;
+	@apply contentText;
+}
+
+/* UITop */
+
+.uiTop {
+	@apply stickTop z-50;
+	@apply w-full;
+	@apply flex-col justify-start items-center inline-flex;
+	/* @apply border-black border-opacity-30; */
+}
+
+.uiTop > * {
+	@apply w-1/3;
+}
+
+:not([data-fixed='1'])[data-backdrop='1'] > .uiTop,
+:not([data-backdrop='1']) > .uiTop {
+	@apply contentBackground;
+}
+
+:not([data-search='1']) > .uiTop[data-visible='1'] {
+	@apply borderBottom;
+}
+
+/* UITop smallTitle */
+.uiSmallTitleContainer {
+	@apply w-full h-11 relative flex items-center justify-between  z-20;
+}
+.uiSmallTitleButton {
+	/* @apply px-2; */
+	@apply py-[11px] justify-start items-center gap-[3px] inline-flex;
+	@apply text-buttonColor text-[17px] font-normal leading-snug;
+	@apply truncate;
+
+	/* @apply w-1/3; */
+}
+.uiSmallTitleButtonLabel {
+	@apply -m-1 truncate;
+}
+
+.uiSmallTitle {
+	@apply text-center text-[17px] leading-snug font-bold items-center justify-center truncate;
+}
+
+/* UITop rightIcon */
+.uiRightIcon {
+	@apply inline-flex justify-end items-center gap-4;
+	@apply defaultPaddingX;
+	/* todo : global variable */
+}
+
+.uiTopRightIcon {
+	@apply text-right text-buttonColor text-[17px] font-normal leading-snug;
+}
+.uiTopRightIconWrapped {
+	/* todo : taille & couleur, même que searchBar */
+	@apply p-1 rounded-full;
+	@apply bg-zinc-500 bg-opacity-10;
+	@apply dark:bg-[#333]  dark:bg-opacity-75;
+}
+/* UIBottom */
+
+.uiBottom {
+	@apply relative;
+	@apply self-stretch;
+	@apply flex flex-col flex-grow;
+}
+
+/* UIBottom Top */
+
+.uiBottomTop {
+	@apply stickTop;
+}
+
+.uiBottomTop[data-fixed='1'] {
+	@apply self-stretch;
+	@apply contentBackground;
+}
+[data-backdrop='1'] .uiBottomTop[data-fixed='1'] {
+	@apply barBackdrop;
+	@apply barOpacity;
+}
+
+/* UIBottom Top LargeTitle */
+
+.uiSmallTitle {
+	@apply defaultPaddingX;
+	/* todo : global variable */
+}
+
+/* UIBottom Top SearchBar */
+
+.searchbar {
+	@apply self-stretch;
+	@apply flex flex-col justify-start items-start;
+	@apply defaultPaddingX pt-2 pb-[15px];
+	/* todo : global variable */
+	@apply borderBottom;
+}
+
+.searchbar[data-fixed='1'] {
+	@apply stickTop;
+}
+
+/* UIBottom Content */
+
+.content {
+	@apply contentBackground;
+	@apply defaultPaddingX defaultPaddingY;
+	/* todo : global variable */
+	@apply self-stretch overflow-auto;
+	/* @apply flex w-full text-black font-normal bg-grey; */
+}

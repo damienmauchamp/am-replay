@@ -82,17 +82,17 @@ export const iOSTheme = {
 			DEFAULT: '#C7C7CC',
 			dark: '#48484A',
 		},
-		gray4: {
+		grey4: {
 			light: '#D1D1D6',
 			DEFAULT: '#D1D1D6',
 			dark: '#3A3A3C',
 		},
-		gray5: {
+		grey5: {
 			light: '#E5E5EA',
 			DEFAULT: '#E5E5EA',
 			dark: '#2C2C2E',
 		},
-		gray6: {
+		grey6: {
 			light: '#F2F2F7',
 			DEFAULT: '#F2F2F7',
 			dark: '#1C1C1E',
@@ -104,8 +104,8 @@ export const iOSTheme = {
 /**
  * Theme colors
  */
-const primaryColor = iOSTheme.color.blue
-// const primaryColor = iOSTheme.color.pink
+// const primaryColor = iOSTheme.color.blue
+const primaryColor = iOSTheme.color.pink
 
 const config: Config = {
 	content: [

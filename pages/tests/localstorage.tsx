@@ -154,7 +154,7 @@ export default function localStoragePage() {
 					<Button
 						className={buttonClassNames()}
 						Style="Filled"
-						Color={iOSTheme.color.gray4.dark}
+						Color={iOSTheme.color.grey4.dark}
 						onClick={onLog}
 					>
 						Log
