@@ -15,6 +15,73 @@ export default function navbar() {
 		'Rechercher dans les playlists'
 	)
 
+	const renderTests = () => (
+		<>
+			<h1>Content</h1>
+			<section>
+				<h2>Actions</h2>
+				<div className="grid grip-cols-2 grip-rows-2 gap-2">
+					<Button
+						Style="Filled"
+						onClick={() => setWrappedIcon(!wrappedIcon)}
+					>
+						Wrapped icon : {Number(wrappedIcon)}
+					</Button>
+
+					<Button Style="Filled" onClick={() => setSearch(!search)}>
+						Search : {Number(search)}
+					</Button>
+
+					<Button Style="Filled" onClick={() => setScrollX(!scrollX)}>
+						ScrollX : {Number(scrollX)}
+					</Button>
+
+					<div>
+						<label>
+							title :
+							<input
+								type="text"
+								name="title"
+								value={title}
+								onInput={({ currentTarget }) =>
+									setTitle(currentTarget.value)
+								}
+							/>
+						</label>
+					</div>
+
+					<div>
+						<label>
+							back :
+							<input
+								type="text"
+								name="back"
+								value={back}
+								onInput={({ currentTarget }) =>
+									setBack(currentTarget.value)
+								}
+							/>
+						</label>
+					</div>
+
+					<div>
+						<label>
+							searchPlaceholder :
+							<input
+								type="text"
+								name="searchPlaceholder"
+								value={searchPlaceholder}
+								onInput={({ currentTarget }) =>
+									setSearchPlaceholder(currentTarget.value)
+								}
+							/>
+						</label>
+					</div>
+				</div>
+			</section>
+		</>
+	)
+
 	return (
 		<>
 			<NavBarTest
@@ -28,79 +95,8 @@ export default function navbar() {
 				}
 				topIconWrapped={wrappedIcon}
 			>
-				<h1>Content</h1>
-
-				<section>
-					<h2>Actions</h2>
-					<div className="grid grip-cols-2 grip-rows-2 gap-2">
-						<Button
-							Style="Filled"
-							onClick={() => setWrappedIcon(!wrappedIcon)}
-						>
-							Wrapped icon : {Number(wrappedIcon)}
-						</Button>
-
-						<Button
-							Style="Filled"
-							onClick={() => setSearch(!search)}
-						>
-							Search : {Number(search)}
-						</Button>
-
-						<Button
-							Style="Filled"
-							onClick={() => setScrollX(!scrollX)}
-						>
-							ScrollX : {Number(scrollX)}
-						</Button>
-
-						<div>
-							<label>
-								title :
-								<input
-									type="text"
-									name="title"
-									value={title}
-									onInput={({ currentTarget }) =>
-										setTitle(currentTarget.value)
-									}
-								/>
-							</label>
-						</div>
-
-						<div>
-							<label>
-								back :
-								<input
-									type="text"
-									name="back"
-									value={back}
-									onInput={({ currentTarget }) =>
-										setBack(currentTarget.value)
-									}
-								/>
-							</label>
-						</div>
-
-						<div>
-							<label>
-								searchPlaceholder :
-								<input
-									type="text"
-									name="searchPlaceholder"
-									value={searchPlaceholder}
-									onInput={({ currentTarget }) =>
-										setSearchPlaceholder(
-											currentTarget.value
-										)
-									}
-								/>
-							</label>
-						</div>
-					</div>
-				</section>
+				{renderTests()}
 			</NavBarTest>
-			{/* <TestsNavLinks /> */}
 		</>
 	)
 }
