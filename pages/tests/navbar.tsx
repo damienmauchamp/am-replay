@@ -61,8 +61,8 @@ export default function navbar() {
 									type="text"
 									name="title"
 									value={title}
-									onInput={({ target }) =>
-										setTitle(target.value)
+									onInput={({ currentTarget }) =>
+										setTitle(currentTarget.value)
 									}
 								/>
 							</label>
@@ -75,8 +75,8 @@ export default function navbar() {
 									type="text"
 									name="back"
 									value={back}
-									onInput={({ target }) =>
-										setBack(target.value)
+									onInput={({ currentTarget }) =>
+										setBack(currentTarget.value)
 									}
 								/>
 							</label>
@@ -89,8 +89,10 @@ export default function navbar() {
 									type="text"
 									name="searchPlaceholder"
 									value={searchPlaceholder}
-									onInput={({ target }) =>
-										setSearchPlaceholder(target.value)
+									onInput={({ currentTarget }) =>
+										setSearchPlaceholder(
+											currentTarget.value
+										)
 									}
 								/>
 							</label>
