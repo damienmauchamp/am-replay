@@ -76,7 +76,7 @@ const AlbumPickerTab: React.FC<AlbumPickerTabProps> = ({
 
 						return (
 							libraryAlbum && (
-								<li>
+								<li key={albumId}>
 									{/* <div className="grid grid-cols-2"> */}
 									<div className="flex gap-2">
 										<Image

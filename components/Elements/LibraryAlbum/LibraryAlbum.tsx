@@ -1,5 +1,8 @@
-import classes from './LibraryAlbum.module.css'
+import styles from './LibraryAlbum.module.css'
 import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
+// import { getImagePalette } from 'react-image-palette'
+import { ColorExtractor } from 'react-color-extractor'
 
 type LibraryAlbum = {
 	id: string
@@ -46,22 +49,90 @@ const LibraryAlbum = (props: {
 	album: LibraryAlbum
 	displayedAlbumId: number
 }) => {
+	// dark mode
+	const [mode, setMode] = useState<'dark' | 'light'>('light')
+
+	const getMode = () =>
+		window.matchMedia('(prefers-color-scheme: dark)') ? 'dark' : 'light'
+
+	// const getMode = () =>
+	useEffect(() => {
+		setMode(getMode())
+		window
+			.matchMedia('(prefers-color-scheme: dark)')
+			.addEventListener('change', (event) => {
+				// console.log('event')
+				// const colorScheme = event.matches ? 'dark' : 'light'
+				// console.log(colorScheme) // "dark" or "light"
+				// setMode(event.matches ? 'dark' : 'light')
+				setMode(getMode())
+			})
+	}, [])
+
+	// color palette
+	const [colors, setColors] = useState<string[]>([])
+	const getColors = (newColors: string[]) => {
+		setColors(newColors)
+	}
+
+	const colorIndexes = {
+		light: 0,
+		dark: 2,
+	}
+
+	const imageUrl = getImageUrl(props.album, defaultSize)
+	const imageRef = useRef<HTMLImageElement>(null)
+
+	useEffect(() => {}, [])
+
+	useEffect(() => {
+		console.log('colors:', colors)
+	}, [colors])
+
 	return (
 		<>
-			<div>
-				<Image
-					className={classes.artwork}
-					src={getImageUrl(props.album, defaultSize)}
-					alt={getImageAlt(props.album)}
-					width={defaultSize}
-					height={defaultSize}
-				/>
-				<p>
-					ID: {props.displayedAlbumId} - {props.album.id}
-				</p>
-				<p>{props.album.attributes.name}</p>
-				<p>{props.album.attributes.artistName}</p>
-				<p>{props.album.attributes.releaseDate}</p>
+			<p>Mode : {mode}</p>
+			<ColorExtractor src={imageUrl} getColors={getColors} />
+			<div className="flex">
+				{colors &&
+					colors.map((color: string) => {
+						return (
+							<div key={color} style={{ backgroundColor: color }}>
+								{color}
+							</div>
+						)
+					})}{' '}
+			</div>
+
+			<div
+				// className={`${styles.album} bg-[${
+				// 	colors ? colors[colorIndexes.light] : ''
+				// }]`}
+				className={styles.album}
+				style={{
+					backgroundColor: colors ? colors[colorIndexes[mode]] : '',
+				}}
+			>
+				<div>
+					<Image
+						className={styles.artwork}
+						src={imageUrl}
+						alt={getImageAlt(props.album)}
+						width={defaultSize}
+						height={defaultSize}
+						ref={imageRef}
+					/>
+				</div>
+				<div className={styles.details}>
+					<p>
+						ID: {props.displayedAlbumId} - {props.album.id}
+					</p>
+					<p className="font-semibold">
+						{props.album.attributes.name}
+					</p>
+					<p>{props.album.attributes.artistName}</p>
+					<p>{props.album.attributes.releaseDate}</p>
+				</div>
 			</div>
 		</>
 	)
