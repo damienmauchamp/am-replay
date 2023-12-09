@@ -108,6 +108,12 @@ export const iOSTheme = {
 export const primaryColor = iOSTheme.color.pink
 export const buttonColor = primaryColor
 
+export const inactionColor = {
+	light: '#eeeeef',
+	DEFAULT: '#eeeeef',
+	dark: '#1c1c1e',
+}
+
 const config: Config = {
 	content: [
 		'./pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -124,28 +130,25 @@ const config: Config = {
 			colors: {
 				primaryColor: primaryColor,
 				buttonColor: buttonColor,
-				// searchInputBg: {
-				// 	light: '#EEEEEF',
-				// 	DEFAULT: '#EEEEEF',
-				// 	dark: '#1c1c1e',
-				// },
+				inactionColor: inactionColor,
+				//
+				itemDefaultBg: {
+					light: '#e9e9ea',
+					DEFAULT: '#e9e9ea',
+					dark: '#262629',
+				},
+				//
 				searchInputBg: {
-					light: '#71717a', // zinc-500
-					DEFAULT: '#71717a', // zinc-500
-					dark: '#1c1c1e', // todo
+					light: '#71717a',
+					DEFAULT: '#71717a',
+					dark: '#262629', // todo
+					// dark: '#1c1c1e', // todo
 				},
 				searchInputText: {
-					light: '#333333', // zinc-700
-					DEFAULT: '#333333', // zinc-700
-					dark: '#98989f', // todo
+					light: '#838388',
+					DEFAULT: '#838388',
+					dark: '#e9e9ea', // todo
 				},
-				// searchInputText: {
-				// 	light: '#838388',
-				// 	DEFAULT: '#838388',
-				// 	dark: '#98989f',
-				// },
-				// searchInputBg: iOSTheme.color.grey,
-				// searchInputText: iOSTheme.color.grey,
 				// iOS17
 				...iOSTheme.color,
 			},

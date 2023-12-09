@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import styles from './UISearchBar.module.css'
 import { IoMic, IoSearch } from 'react-icons/io5'
-// import 'regenerator-runtime/runtime'
+import 'regenerator-runtime/runtime'
 import SpeechRecognition, {
 	useSpeechRecognition,
 } from 'react-speech-recognition'
@@ -36,6 +36,10 @@ const UISearchBar = forwardRef(
 		// searchText
 		const [searchbarText, setSearchBarText] = useState<string>(value)
 		const updateSearchText = (text: string) => setSearchBarText(text)
+
+		useEffect(() => {
+			updateSearchText(value)
+		}, [value])
 
 		// transcript
 		const {
@@ -75,9 +79,6 @@ const UISearchBar = forwardRef(
 			setSpeechToTextEnabled(Boolean(speechToText))
 		}, [speechToText])
 		useEffect(() => {
-			updateSearchText(value)
-		}, [value])
-		useEffect(() => {
 			updateSearchText(transcript)
 			onInput &&
 				onInput({
@@ -109,22 +110,18 @@ const UISearchBar = forwardRef(
 			)
 		}
 
-		// // endregion SpeechToText
-
 		return (
 			<div
 				ref={ref}
 				{...props}
 				className={`${props.className} ${styles.searchbar}`}
 			>
-				UISearchBarUISearchBar
 				<div className={styles.inputContainer}>
 					<input
 						className={styles.input}
 						type="text"
 						value={searchbarText}
-						onInput={(e) => {
-							console.log('BAR:', e.currentTarget.value)
+						onInput={(e: React.FormEvent<HTMLInputElement>) => {
 							updateSearchText(e.currentTarget.value)
 							return onInput && onInput(e)
 						}}
@@ -140,10 +137,6 @@ const UISearchBar = forwardRef(
 						</div>
 					</div>
 				</div>
-				{/* <div className="gap-uiNavigation px-uiNavigation">
-					<p>sss</p>
-					<p>sss</p>
-				</div> */}
 			</div>
 		)
 	}

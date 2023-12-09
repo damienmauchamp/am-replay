@@ -8,10 +8,6 @@ import React, {
 import { IoChevronBackOutline, IoMic, IoSearch } from 'react-icons/io5'
 import TestsNavLinks from '@/components/Tests/TestsNavLinks'
 import styles from './UINavigation.module.css'
-import 'regenerator-runtime/runtime'
-import SpeechRecognition, {
-	useSpeechRecognition,
-} from 'react-speech-recognition'
 import UISearchBar from '../UISearchBar/UISearchBar'
 
 export interface UINavBarTopCornerIconProps {
@@ -233,16 +229,60 @@ const UINavigation = ({
 	// region SearchBar
 	const defaultSearchText = ''
 	const [searchbarText, setSearchBarText] = useState<string>(searchText)
+
+	const onInput = (e: React.FormEvent<HTMLInputElement>) => {
+		onSearchInput && onSearchInput(e)
+		updateSearchText(e.currentTarget.value)
+	}
+
+	const onTranscript = (value: string) => {
+		onSearchTranscript(value)
+	}
 	// endregion SearchBar
 
 	const updateSearchText = (text: string) => {
-		console.log('updateSearchText', text)
 		setSearchBarText(text || defaultSearchText)
 	}
 	useEffect(() => {
-		console.log('uE:', searchText)
 		updateSearchText(searchText)
 	}, [searchText])
+
+	// region Debug & tests
+	const debugContent = () => {
+		return (
+			<div className="flex flex-col gap-4 mt-4 ">
+				<TestsNavLinks />
+
+				<div
+					className={`w-full border-t 
+		${false ? 'bg-red' : ''}
+		${false ? 'min-h-[999px]' : ''}
+		${true ? 'min-w-[999px]' : ''}
+		`}
+				>
+					<p>content / scrollY : {scrollY}</p>
+					<p>searchBarIsFixed: {Number(searchBarIsFixed)}</p>
+					{/* <p>transcript : {transcript}</p> */}
+					<p>
+						speechToText :{' '}
+						{speechToText !== undefined
+							? Number(speechToText)
+							: 'undefined'}
+					</p>
+					<p>
+						speechToTextEnabled :{' '}
+						{speechToText !== undefined
+							? Number(speechToText)
+							: 'undefined'}
+					</p>
+					<div className="my-96"></div>
+					<div className="my-96"></div>
+					<p>Foot</p>
+				</div>
+			</div>
+		)
+	}
+	// endregion Debug & tests
 
 	return (
 		<div className="w-full h-[100vh] flex" style={{}}>
@@ -253,14 +293,15 @@ const UINavigation = ({
 				data-backdrop={Number(faded)}
 				data-search={Number(search)}
 			>
+				{/* Topbar */}
 				<div
 					id="uiTop"
 					ref={topRef}
 					className={styles.uiTop}
 					data-visible={Number(smallTitleVisible)}
 				>
-					{/* Topbar */}
 					<div className={styles.uiSmallTitleContainer}>
+						{/* Go Back */}
 						<button
 							className={styles.uiSmallTitleButton}
 							onClick={(e) => (goBack && onBack ? onBack(e) : {})}
@@ -282,6 +323,7 @@ const UINavigation = ({
 							)}
 						</button>
 
+						{/* Small title */}
 						<div
 							ref={smallTitleRef}
 							style={{ opacity: Number(smallTitleVisible) }}
@@ -290,6 +332,7 @@ const UINavigation = ({
 							{title}
 						</div>
 
+						{/* Top right icons */}
 						<div className={styles.uiRightIcon}>
 							{renderTopRightIcons()}
 						</div>
@@ -298,6 +341,7 @@ const UINavigation = ({
 
 				{/* Screen */}
 				<div id="uiBottom" className={styles.uiBottom}>
+					{/* Header content */}
 					<div
 						id="uiBottomTopContent"
 						ref={bottomTopContentRef}
@@ -312,6 +356,7 @@ const UINavigation = ({
 							{headerContent}
 						</div>
 					</div>
+
 					<div
 						id="uiBottomTop"
 						data-fixed={Number(searchBarIsFixed)}
@@ -342,7 +387,6 @@ const UINavigation = ({
 						</div>
 
 						{/* Search bar */}
-						{/* {search && 'searchText:' + searchText} */}
 						{search && (
 							<UISearchBar
 								id="searchbar"
@@ -351,62 +395,9 @@ const UINavigation = ({
 								speechToText={speechToText}
 								placeholder={searchPlaceholder}
 								data-fixed={Number(searchBarIsFixed)}
-								onInput={
-									(e) => {
-										console.log('UINav SonInput:', e)
-										onSearchInput && onSearchInput(e)
-										updateSearchText(e.currentTarget.value)
-									}
-									// setSearchBarText(e.currentTarget.value)
-								}
-								onTranscript={(value: string) => {
-									console.log('UINav SonTranscript:', value)
-									onSearchTranscript(value)
-								}}
-								// speechToText={speechToTextEnabled}
+								onInput={onInput}
+								onTranscript={onTranscript}
 							/>
-						)}
-						{search && (
-							<div
-								id="searchbar"
-								ref={searchBarRef}
-								data-fixed={Number(searchBarIsFixed)}
-								className={styles.searchbar}
-							>
-								<div className="self-stretch px-2 py-[7px] bg-zinc-500 bg-opacity-10 rounded-[10px] justify-start items-center inline-flex">
-									<div className="w-[25px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-										<IoSearch size={18} />
-									</div>
-									<div className="grow shrink basis-0 h-[22px] text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug truncate">
-										{searchbarText}
-									</div>
-									<div className="text-center text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
-										<div>
-											{(speechToText && (
-												<IoMic
-													size={18}
-													// data-enabled={Number(
-													// 	speechToText
-													// )}
-													className={`${styles.uiSearchBarSpeechToText}`}
-													// onClick={(e: Event) =>
-													// 	speechToTextEnabled
-													// 		? speechToTextIsListening
-													// 			? stopListening(
-													// 					e
-													// 			  )
-													// 			: startListening(
-													// 					e
-													// 			  )
-													// 		: {}
-													// }
-												/>
-											)) ||
-												''}
-										</div>
-									</div>
-								</div>
-							</div>
 						)}
 					</div>
 
@@ -418,41 +409,7 @@ const UINavigation = ({
 						}`}
 					>
 						{children}
-						{true && (
-							<div className="flex flex-col gap-4 mt-4 ">
-								<TestsNavLinks />
-
-								<div
-									className={`w-full border-t 
-						${false ? 'bg-red' : ''}
-						${false ? 'min-h-[999px]' : ''}
-						${true ? 'min-w-[999px]' : ''}
-						`}
-								>
-									<p>content / scrollY : {scrollY}</p>
-									<p>
-										searchBarIsFixed:{' '}
-										{Number(searchBarIsFixed)}
-									</p>
-									{/* <p>transcript : {transcript}</p> */}
-									<p>
-										speechToText :{' '}
-										{speechToText !== undefined
-											? Number(speechToText)
-											: 'undefined'}
-									</p>
-									<p>
-										speechToTextEnabled :{' '}
-										{speechToText !== undefined
-											? Number(speechToText)
-											: 'undefined'}
-									</p>
-									<div className="my-96"></div>
-									<div className="my-96"></div>
-									<p>Foot</p>
-								</div>
-							</div>
-						)}
+						{true && debugContent()}
 					</div>
 				</div>
 			</div>

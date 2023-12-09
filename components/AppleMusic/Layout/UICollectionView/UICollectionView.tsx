@@ -9,9 +9,7 @@ type Props = {
 const UICollectionView = ({ items, ...props }: Props) => {
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-4 gap-uiNavigation">
-			{items.map((item) => {
-				return <div>{item}</div>
-			})}
+			{items.map((item) => item)}
 		</div>
 	)
 }

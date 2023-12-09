@@ -32,21 +32,21 @@ export default function navbar() {
 
 	const topCornerIcons = [
 		{
-			title: 'Sort',
+			title: 'Add',
 			Icon: IoAddOutline,
 			wrapped: true,
-			active: false,
+			active: topIconActive,
 			onClick: () => console.log('topCorner : Add'),
 		},
-		{
-			title: 'Sort',
-			Icon: IoReorderThreeOutline,
-			wrapped: true,
-			active: topIconActive,
-			onClick: () => console.log('topCorner : Sort'),
-			ref: useRef(),
-			// ref: useRef<HTMLDivElement>(),
-		},
+		// {
+		// 	title: 'Sort',
+		// 	Icon: IoReorderThreeOutline,
+		// 	wrapped: true,
+		// 	active: false,
+		// 	onClick: () => console.log('topCorner : Sort'),
+		// 	ref: useRef(),
+		// 	// ref: useRef<HTMLDivElement>(),
+		// },
 		{
 			title: 'Camera',
 			Icon: IoVideocamOutline,
@@ -178,10 +178,12 @@ export default function navbar() {
 				searchText={searchText}
 				onSearchInput={(e) => {
 					setSearchText(e.currentTarget.value)
+					console.log('LAUNCH SEARCH', e.currentTarget.value)
 				}}
 				onSearchTranscript={(value) => {
 					setTranscript(value)
 				}}
+				// onSearch
 				goBack={goBack}
 				goBackLabel={goBackLabel}
 				onBack={onBack}

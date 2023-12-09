@@ -106,16 +106,18 @@
 }
 
 .uiTopRightIcons {
-	@apply justify-end items-start gap-2.5 flex truncate;
+	@apply justify-end items-center gap-2.5 flex truncate;
 }
 .uiTopRightIcon {
 	@apply text-right text-buttonColor text-[17px] font-normal leading-snug;
 }
 .uiTopRightIconWrapped {
 	/* todo : taille & couleur, même que searchBar */
-	@apply p-1 rounded-full;
-	@apply bg-zinc-500 bg-opacity-10;
-	@apply dark:bg-[#333] dark:bg-opacity-75;
+	@apply p-0.5 rounded-full;
+	/* @apply bg-zinc-500 bg-opacity-10;
+	@apply dark:bg-[#333] dark:bg-opacity-75; */
+	@apply bg-inactionColor;
+	@apply dark:bg-inactionColor-dark;
 }
 .uiTopRightIconActive {
 }
