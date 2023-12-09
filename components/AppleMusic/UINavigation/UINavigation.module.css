@@ -7,6 +7,9 @@
 .contentText {
 	@apply text-black dark:text-white;
 }
+.contentTextInverted {
+	@apply dark:text-black text-white;
+}
 
 /* Backdrop & opacity */
 .barBackdrop {
@@ -68,13 +71,13 @@
 	@apply contentBackground;
 }
 
-:not([data-search='1']) > .uiTop[data-visible='1'] {
+:not([data-search='1'])[data-fixed='1'] .uiBottomTop {
 	@apply borderBottom;
 }
 
 /* UITop smallTitle */
 .uiSmallTitleContainer {
-	@apply w-full h-11 relative flex items-center justify-between  z-20;
+	@apply w-full h-11 relative flex items-center justify-between  z-50;
 }
 .uiSmallTitleContainer > * {
 	/* @apply w-1/3; */
@@ -104,6 +107,9 @@
 	@apply pr-5;
 }
 
+.uiTopRightIcons {
+	@apply justify-end items-start gap-2.5 flex truncate;
+}
 .uiTopRightIcon {
 	@apply text-right text-buttonColor text-[17px] font-normal leading-snug;
 }
@@ -111,7 +117,12 @@
 	/* todo : taille & couleur, même que searchBar */
 	@apply p-1 rounded-full;
 	@apply bg-zinc-500 bg-opacity-10;
-	@apply dark:bg-[#333]  dark:bg-opacity-75;
+	@apply dark:bg-[#333] dark:bg-opacity-75;
+}
+.uiTopRightIconActive {
+}
+.uiTopRightIconWrapped.uiTopRightIconActive {
+	@apply bg-buttonColor contentTextInverted;
 }
 /* UIBottom */
 
@@ -121,28 +132,58 @@
 	@apply flex flex-col flex-grow;
 }
 
+/* UIBottom Top Content */
+
+.uiBottomTopContent {
+	@apply defaultPaddingX;
+}
+
 /* UIBottom Top */
 
 .uiBottomTop {
 	@apply stickTop;
 }
+.uiBottomTop:before {
+	content: ' ';
+	position: absolute;
+	top: -20px;
+	height: 20px;
+	left: 0;
+	right: 0;
+	@apply contentBackground;
+	@apply barBackdrop;
+	@apply barOpacity;
+	/* background: red; */
+}
 
-.uiBottomTop[data-fixed='1'] {
+.uiBottomTop[data-fixed='1'],
+.uiBottomTopContent[data-fixed='1'] {
 	@apply self-stretch;
 	@apply contentBackground;
 }
-[data-backdrop='1'] .uiBottomTop[data-fixed='1'] {
+[data-backdrop='1'] .uiBottomTop[data-fixed='1'],
+[data-backdrop='1'] .uiBottomTopContent[data-fixed='1'] {
 	@apply barBackdrop;
 	@apply barOpacity;
 }
 
 /* UIBottom Top LargeTitle */
 
+.uiLargeTitleContainer {
+	@apply defaultPaddingX;
+	@apply self-stretch gap-2.5 flex flex-row justify-start items-start overflow-hidden;
+}
+
 .uiLargeTitle {
 	@apply titleTransition;
-	@apply defaultPaddingX;
 	/* todo : global variable */
-	@apply w-full px-5 pt-[3px] text-[34px] font-bold leading-[41px] truncate;
+	@apply w-full pt-[3px] text-[34px] font-bold leading-[41px] truncate;
+}
+
+.uiLargeTitleRight {
+	@apply flex items-center justify-center;
+	@apply w-1/4 truncate;
+	/* @apply self-center text-center ; */
 }
 
 /* UIBottom Top SearchBar */
@@ -150,13 +191,13 @@
 .searchbar {
 	@apply self-stretch;
 	@apply flex flex-col justify-start items-start;
-	@apply defaultPaddingX pt-2 pb-[15px];
 	/* todo : global variable */
-	@apply borderBottom;
+	@apply defaultPaddingX pt-2 pb-[15px];
 }
 
 .searchbar[data-fixed='1'] {
 	@apply stickTop;
+	@apply borderBottom;
 }
 
 .uiSearchBarSpeechToText {

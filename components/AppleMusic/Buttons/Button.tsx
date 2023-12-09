@@ -1,4 +1,9 @@
-import { colorToRgbString, colorToRgbaString } from '@/helpers/colors'
+import {
+	ColorProps,
+	colorToRgbString,
+	colorToRgbaString,
+	getColor,
+} from '@/helpers/colors'
 import classes from './Button.module.css'
 import React, {
 	ButtonHTMLAttributes,
@@ -26,15 +31,6 @@ enum ButtonLabelType {
 	SymbolText = 'Symbol + Text',
 	Text = 'Text',
 }
-
-type ColorProps =
-	| undefined
-	| string
-	| {
-			DEFAULT: string
-			light: string
-			dark: string
-	  }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	/**
@@ -103,13 +99,6 @@ const ButtonComponent = ({
 			return props.onClick(e)
 		}
 		debug()
-	}
-
-	const getColor = (color: ColorProps) => {
-		if (!color) {
-			return ''
-		}
-		return typeof color === 'string' ? color : color.DEFAULT || color.light
 	}
 
 	const buttonStyle = () => {

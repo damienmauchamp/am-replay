@@ -104,8 +104,9 @@ export const iOSTheme = {
 /**
  * Theme colors
  */
-// const primaryColor = iOSTheme.color.blue
-const primaryColor = iOSTheme.color.pink
+// export const primaryColor = iOSTheme.color.blue
+export const primaryColor = iOSTheme.color.pink
+export const buttonColor = primaryColor
 
 const config: Config = {
 	content: [
@@ -122,7 +123,7 @@ const config: Config = {
 			},
 			colors: {
 				primaryColor: primaryColor,
-				buttonColor: primaryColor,
+				buttonColor: buttonColor,
 				// iOS17
 				...iOSTheme.color,
 			},

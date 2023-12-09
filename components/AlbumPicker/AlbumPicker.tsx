@@ -12,6 +12,10 @@ import TopTab from './Tabs/TopTab'
 import TodoTab from './Tabs/TodoTab'
 import moment from 'moment-timezone'
 
+/**
+ * @todo save before closing
+ */
+
 const log = (...args: any) => {
 	logDebug('AlbumPicker', 'teal', ...args)
 }
@@ -33,7 +37,6 @@ const DATATYPE_CODE = 'DataType'
 type DataType = {
 	// years: YearType[]
 	years: { [year: number]: YearType }
-	// todo : cache, localStorage, save before closing, button save, ...
 	// cache: {
 	// 	page: null,
 	// },
@@ -432,7 +435,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 	}
 
 	const getFirstAlbumIdWithoutCategory = () => {
-		// todo : prendre en compte le displayedId
+		// todo : start from displayedId ?
 		let firstIndex = null
 		albums.every((album, index) => {
 			if (!albumHasCategory(album.id)) {
@@ -457,7 +460,6 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			lastAlbum: albums[displayedAlbumId] || null,
 		})
 
-		// todo
 		const lastAlbum = albums[displayedAlbumId - 1] || null
 		if (!lastAlbum) {
 			log('(onAlbumUndo) no last')

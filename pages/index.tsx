@@ -15,7 +15,7 @@ const log = (...args: any) => {
 	logDebug('index', 'cyan', ...args)
 }
 
-// todo : Error wrap si erreur de chargement du musicKit
+// todo : Error wrap if error while loading musicKit
 const Landing: NextPage<{}> = () => {
 	const { logged } = useMusicKitContext()
 

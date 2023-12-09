@@ -56,7 +56,7 @@ const SegmentedControls = ({
 
 	// region state
 	const toggle = (index: number) => {
-		// todo : check if element exists
+		// todo : check if element exists ?
 		const prev = selected
 		setSelected(index)
 		// props.onSelect && props.onSelect(index, prev, items[index])

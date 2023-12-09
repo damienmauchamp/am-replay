@@ -1,3 +1,18 @@
+export type ColorProps =
+	| undefined
+	| string
+	| {
+			DEFAULT: string
+			light: string
+			dark: string
+	  }
+export const getColor = (color: ColorProps) => {
+	if (!color) {
+		return ''
+	}
+	return typeof color === 'string' ? color : color.DEFAULT || color.light
+}
+
 export const colorToRgbString = (color: string, delimiter: string = ' ') => {
 	const rgba = colorToRgba(color)
 	return `${rgba.r}${delimiter}${rgba.g}${delimiter}${rgba.b}`

@@ -1,20 +1,41 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
+import React, {
+	CSSProperties,
+	ReactNode,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
 import { IoChevronBackOutline, IoMic, IoSearch } from 'react-icons/io5'
-import TestsNavLinks from '../TestsNavLinks'
-import styles from './NavBarTest.module.css'
+import TestsNavLinks from '@/components/Tests/TestsNavLinks'
+import styles from './UINavigation.module.css'
 import 'regenerator-runtime/runtime'
 import SpeechRecognition, {
 	useSpeechRecognition,
 } from 'react-speech-recognition'
 
+export interface UINavBarTopCornerIconProps {
+	key?: string
+	ref?: React.MutableRefObject<HTMLDivElement | undefined>
+	title?: string
+	Icon: React.ElementType
+	wrapped: boolean
+	active: boolean
+	onClick?: React.MouseEventHandler<HTMLDivElement>
+	style?: CSSProperties
+}
+
 /**
  * @property {boolean} faded fade BG
  */
-type Props = {
+type UINavBarProps = {
 	children?: ReactNode
+	headerContent?: ReactNode
 	//
 	title?: string
-	back?: string
+	titleRightContent?: ReactNode
+	//
+	goBack?: boolean
+	goBackLabel?: string
 	onBack?: React.MouseEventHandler<HTMLButtonElement>
 	//
 	faded?: boolean
@@ -25,38 +46,93 @@ type Props = {
 	//
 	scrollX?: boolean
 
-	TopIcon?: React.ElementType
-	topIconWrapped?: boolean
-	onTopIconClick?: React.MouseEventHandler<HTMLDivElement>
+	//
+	topCornerIcons: UINavBarTopCornerIconProps[]
 }
 
-const defaultProps: Props = {
+const defaultProps: UINavBarProps = {
+	//
+	goBack: false,
+	goBackLabel: '',
+	onBack: () => {},
+	//
 	searchPlaceholder: 'Search',
 	speechToText: true,
 	faded: true,
 	// scrollX: true,
-	// onTopIconClick: () => void
+	topCornerIcons: [] as UINavBarTopCornerIconProps[],
 }
 
-const NavBarTest = ({
+/**
+ * @todo move classNames to css + cleanup
+ * @todo real colors + border outline
+ * @todo input bar + color + onFocus fixed & titleHidden + Cancel
+ * @todo iPad & desktop versions
+ */
+const UINavigation = ({
 	children,
+	headerContent,
 	title,
-	back,
-	TopIcon,
-	topIconWrapped,
-	onTopIconClick,
+	titleRightContent,
+	goBack,
+	goBackLabel,
 	onBack,
+	topCornerIcons,
 	faded,
 	search,
 	searchPlaceholder,
 	speechToText,
 	...props
-}: Props) => {
+}: UINavBarProps) => {
+	// region Utils
+	const generateUniqId = (prefix: string = '') =>
+		`${prefix}${Date.now() * Math.random()}`
+	// endregion Utils
+
+	// region Top bar
+
+	// region TopRightIcons
+	const renderTopRightIcon = (
+		topIcon: UINavBarTopCornerIconProps,
+		index: number,
+		array: UINavBarTopCornerIconProps[]
+	) => {
+		let props = {}
+		if (topIcon.ref) {
+			props = { ...props, ref: topIcon.ref }
+		}
+
+		return (
+			topIcon.Icon && (
+				<div
+					key={topIcon.key || generateUniqId(`topIconKey-${index}`)}
+					className={`${styles.uiTopRightIcon} ${
+						(topIcon.wrapped && styles.uiTopRightIconWrapped) || ''
+					} ${(topIcon.active && styles.uiTopRightIconActive) || ''}`}
+					onClick={topIcon.onClick}
+					style={{ ...topIcon.style }}
+					title={topIcon.title}
+					{...props}
+				>
+					<topIcon.Icon size={topIcon.wrapped ? 20 : 30} />
+				</div>
+			)
+		)
+	}
+	const renderTopRightIcons = () => (
+		<>
+			<div className={styles.uiTopRightIcons}>
+				{topCornerIcons.map(renderTopRightIcon)}
+			</div>
+		</>
+	)
+	// endregion TopRightIcons
+
+	// endregion Top bar
+
 	// region Titles toggling
 
 	// small title
-	// todo : useRef / getBound
-	const titleSwitchScroll = 32
 	const smallTitleRef = useRef<HTMLDivElement>(null)
 	const [smallTitleVisible, setSmallTitleVisible] = useState<boolean>(false)
 
@@ -65,13 +141,36 @@ const NavBarTest = ({
 	const [largeTitleVisible, setLargeTitleVisible] = useState<boolean>(true)
 	const topRef = useRef<HTMLDivElement>(null)
 
+	const bottomTopContentRef = useRef<HTMLDivElement>(null)
+
+	const defaultTitleSwitchScroll = 32,
+		gap = 12
+	const getTitleSwitchLimit = () => {
+		const largeTitleInfo = largeTitleRef.current?.getBoundingClientRect()
+		const topBarInfo = topRef.current?.getBoundingClientRect()
+		const bottomTopContentInfo =
+			bottomTopContentRef.current?.getBoundingClientRect()
+
+		if (!largeTitleInfo || !topBarInfo) {
+			return defaultTitleSwitchScroll
+		}
+
+		let limit = topBarInfo.bottom - gap
+
+		if (bottomTopContentInfo) {
+			limit += bottomTopContentInfo.height
+		}
+		return limit
+	}
+
 	// scroll
 	const [scrollY, setScrollY] = useState<number>(0)
 
 	const toggleSearchBarFixation = () => {
-		if (!search) {
-			return
-		}
+		// if (!search) {
+		// 	return
+		// }
+
 		const topBarInfo = topRef.current?.getBoundingClientRect()
 		if (!topBarInfo) {
 			console.error('NO topBarInfo')
@@ -80,14 +179,14 @@ const NavBarTest = ({
 
 		// fixing searchbar
 		const topBarBottom = topBarInfo.top + topBarInfo.height
-		const searchBarShouldBeFixed = topBarBottom <= window.scrollY
+		const searchBarShouldBeFixed = getTitleSwitchLimit() <= window.scrollY
 
 		// fix for the clipping title
 		const titleGap = 5
 		if (largeTitleRef.current) {
 			if (
 				topBarBottom <= window.scrollY + titleGap &&
-				window.scrollY > titleSwitchScroll
+				window.scrollY > getTitleSwitchLimit()
 			) {
 				largeTitleRef.current.style.visibility = 'hidden'
 			} else {
@@ -101,9 +200,11 @@ const NavBarTest = ({
 		const handleScroll = () => {
 			setScrollY(window.scrollY)
 
+			const limit = getTitleSwitchLimit()
+
 			// titles visibility
-			setSmallTitleVisible(window.scrollY > titleSwitchScroll)
-			setLargeTitleVisible(window.scrollY <= titleSwitchScroll)
+			setSmallTitleVisible(window.scrollY > limit)
+			setLargeTitleVisible(window.scrollY <= limit)
 
 			//
 			toggleSearchBarFixation()
@@ -145,7 +246,8 @@ const NavBarTest = ({
 	const startListening = (e: Event) => {
 		console.log('startListening')
 		if (!isMicrophoneAvailable || !speechToTextEnabled) {
-			// todo
+			// todo : handle error ?
+			setSpeechToTextEnabled(false)
 			console.error('Mic not available')
 			return
 		}
@@ -178,26 +280,6 @@ const NavBarTest = ({
 
 	// endregion SpeechToText
 
-	// region Wrapped icon
-	const renderTopRightIcon = () => (
-		<>
-			<div className="justify-start items-start gap-2.5 flex">
-				{TopIcon && (
-					<div
-						className={`${styles.uiTopRightIcon} ${
-							(topIconWrapped && styles.uiTopRightIconWrapped) ||
-							''
-						}`}
-						onClick={onTopIconClick}
-					>
-						<TopIcon size={topIconWrapped ? 20 : 30} />
-					</div>
-				)}
-			</div>
-		</>
-	)
-	// endregion Wrapped icon
-
 	return (
 		<div className="w-full h-[100vh] flex" style={{}}>
 			<div
@@ -217,9 +299,9 @@ const NavBarTest = ({
 					<div className={styles.uiSmallTitleContainer}>
 						<button
 							className={styles.uiSmallTitleButton}
-							onClick={onBack}
+							onClick={(e) => (goBack && onBack ? onBack(e) : {})}
 						>
-							{back && (
+							{goBack && (
 								<>
 									<IoChevronBackOutline
 										size={28}
@@ -230,7 +312,7 @@ const NavBarTest = ({
 											styles.uiSmallTitleButtonLabel
 										}
 									>
-										{back}
+										{goBackLabel}
 									</div>
 								</>
 							)}
@@ -245,7 +327,7 @@ const NavBarTest = ({
 						</div>
 
 						<div className={styles.uiRightIcon}>
-							{renderTopRightIcon()}
+							{renderTopRightIcons()}
 						</div>
 					</div>
 				</div>
@@ -253,27 +335,45 @@ const NavBarTest = ({
 				{/* Screen */}
 				<div id="uiBottom" className={styles.uiBottom}>
 					<div
+						id="uiBottomTopContent"
+						ref={bottomTopContentRef}
+						data-fixed={Number(searchBarIsFixed)}
+						className={styles.uiBottomTopContent}
+					>
+						<div
+							style={{
+								opacity: Number(largeTitleVisible),
+							}}
+						>
+							{headerContent}
+						</div>
+					</div>
+					<div
 						id="uiBottomTop"
 						data-fixed={Number(searchBarIsFixed)}
 						className={styles.uiBottomTop}
 					>
 						{/* Large title */}
-						{/* h-[52px] */}
 						<div
 							id="largeTitle"
-							// className="self-stretch   flex-col justify-start items-start gap-2.5 flex "
-							className="self-stretch gap-2.5 flex flex-col justify-start items-start overflow-hidden"
-							style={{}}
+							className={styles.uiLargeTitleContainer}
 						>
 							<div
 								ref={largeTitleRef}
 								style={{
 									opacity: Number(largeTitleVisible),
 								}}
-								// className="w-full px-4 pt-[3px] pb-2 text-black text-[34px] font-bold leading-[41px] truncate"
 								className={styles.uiLargeTitle}
 							>
 								{title}
+							</div>
+							<div
+								className={styles.uiLargeTitleRight}
+								style={{
+									opacity: Number(largeTitleVisible),
+								}}
+							>
+								{titleRightContent}
 							</div>
 						</div>
 
@@ -378,6 +478,6 @@ const NavBarTest = ({
 	)
 }
 
-NavBarTest.defaultProps = defaultProps
+UINavigation.defaultProps = defaultProps
 
-export default NavBarTest
+export default UINavigation

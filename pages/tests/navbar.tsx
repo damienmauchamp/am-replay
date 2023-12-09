@@ -1,20 +1,57 @@
 import Button from '@/components/AppleMusic/Buttons/Button'
-import NavBarTest from '@/components/Tests/Pages/NavBarTest'
+import UINavigation, {
+	UINavBarTopCornerIconProps,
+} from '@/components/AppleMusic/UINavigation/UINavigation'
 import TestsNavLinks from '@/components/Tests/TestsNavLinks'
+import { getColor } from '@/helpers/colors'
+import tailwindConfig, { buttonColor, iOSTheme } from '@/tailwind.config'
 
-import React, { useState } from 'react'
-import { IoReorderThreeOutline, IoVideocamOutline } from 'react-icons/io5'
+import React, { useRef, useState } from 'react'
+import {
+	IoAddOutline,
+	IoPersonCircleOutline,
+	IoReorderThreeOutline,
+	IoVideocamOutline,
+} from 'react-icons/io5'
 
 export default function navbar() {
-	const [wrappedIcon, setWrappedIcon] = useState<boolean>(false)
 	const [search, setSearch] = useState<boolean>(true)
 	const [scrollX, setScrollX] = useState<boolean>(false)
 	const [title, setTitle] = useState<string>('Playlists')
-	const [back, setBack] = useState<string>('Retour')
+	const [goBack, setGoBack] = useState<boolean>(true)
+	const [goBackLabel, setGoBackLabel] = useState<string>('Retour')
+	const onBack = () => console.log('onBack()')
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>(
 		'Rechercher dans les playlists'
 	)
 	const [speechToText, setSpeechToText] = useState<boolean>(true)
+	const [topIconActive, setTopIconActive] = useState<boolean>(true)
+
+	const topCornerIcons = [
+		{
+			title: 'Sort',
+			Icon: IoAddOutline,
+			wrapped: true,
+			active: false,
+			onClick: () => console.log('topCorner : Add'),
+		},
+		{
+			title: 'Sort',
+			Icon: IoReorderThreeOutline,
+			wrapped: true,
+			active: topIconActive,
+			onClick: () => console.log('topCorner : Sort'),
+			ref: useRef(),
+			// ref: useRef<HTMLDivElement>(),
+		},
+		{
+			title: 'Camera',
+			Icon: IoVideocamOutline,
+			wrapped: false,
+			active: false,
+			onClick: () => console.log('topCorner : Camera'),
+		},
+	] as UINavBarTopCornerIconProps[]
 
 	const renderTests = () => (
 		<>
@@ -22,19 +59,19 @@ export default function navbar() {
 			<section>
 				<h2>Actions</h2>
 				<div className="grid grip-cols-2 grip-rows-2 gap-2">
-					<Button
-						Style="Filled"
-						onClick={() => setWrappedIcon(!wrappedIcon)}
-					>
-						Wrapped icon : {Number(wrappedIcon)}
-					</Button>
-
 					<Button Style="Filled" onClick={() => setSearch(!search)}>
 						Search : {Number(search)}
 					</Button>
 
 					<Button Style="Filled" onClick={() => setScrollX(!scrollX)}>
 						ScrollX : {Number(scrollX)}
+					</Button>
+
+					<Button
+						Style="Filled"
+						onClick={() => setTopIconActive(!topIconActive)}
+					>
+						topIconActive : {Number(topIconActive)}
 					</Button>
 
 					<Button
@@ -60,17 +97,21 @@ export default function navbar() {
 
 					<div>
 						<label>
-							back :
+							goBackLabel :
 							<input
 								type="text"
-								name="back"
-								value={back}
+								name="goBackLabel"
+								value={goBackLabel}
 								onInput={({ currentTarget }) =>
-									setBack(currentTarget.value)
+									setGoBackLabel(currentTarget.value)
 								}
 							/>
 						</label>
 					</div>
+
+					<Button Style="Filled" onClick={() => setGoBack(!goBack)}>
+						GoBack : {Number(goBack)}
+					</Button>
 
 					<div>
 						<label>
@@ -92,20 +133,39 @@ export default function navbar() {
 
 	return (
 		<>
-			<NavBarTest
+			<UINavigation
 				title={title}
 				search={search}
-				back={back}
+				goBack={goBack}
+				goBackLabel={goBackLabel}
+				onBack={onBack}
 				scrollX={scrollX}
 				searchPlaceholder={searchPlaceholder}
-				TopIcon={
-					wrappedIcon ? IoReorderThreeOutline : IoVideocamOutline
-				}
-				topIconWrapped={wrappedIcon}
 				speechToText={speechToText}
+				topCornerIcons={topCornerIcons}
+				// headerContent={
+				// 	<>
+				// 		<p>Hey !!!</p>
+				// 		<p>Cooool</p>
+				// 	</>
+				// }
+				titleRightContent={
+					<div className="self-stretch ml-auto">
+						<IoPersonCircleOutline
+							className={`cursor-pointer`}
+							onClick={() => {
+								console.log('todo')
+							}}
+							size={40}
+							style={{
+								color: getColor(buttonColor),
+							}}
+						/>
+					</div>
+				}
 			>
 				{renderTests()}
-			</NavBarTest>
+			</UINavigation>
 		</>
 	)
 }
