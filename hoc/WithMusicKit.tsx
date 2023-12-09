@@ -88,7 +88,7 @@ const withMusicKit = <T extends object>(
 			console.log(`Component ${WrappedComponent.name} updated.`)
 		})
 
-		// todo : tests
+		// todo : delete testMethod
 		const testMethod = () => {
 			console.log(`testMethod ${WrappedComponent.name}.`)
 		}

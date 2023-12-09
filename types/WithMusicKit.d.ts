@@ -5,13 +5,13 @@ declare interface WithMusicKitProps {
 	isAuthorized: () => boolean
 	// storybook
 	storyProps: any
-	// todo : tests
+	// todo : delete testMethod
 	testMethod: () => void
 }
 
 const defaultProps: WithMusicKitProps = {
 	// storybook
 	storyProps: {},
-	// todo : tests
+	// todo : delete testMethod
 	testMethod: () => {},
 }

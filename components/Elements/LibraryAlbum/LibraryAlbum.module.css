@@ -1,3 +1,11 @@
+.album {
+	@apply rounded-xl overflow-hidden;
+}
+
 .artwork {
-	@apply rounded-xl;
+	/* @apply rounded-xl; */
+}
+
+.details {
+	@apply flex flex-col justify-center p-4 text-center;
 }
