@@ -12,6 +12,7 @@ import 'regenerator-runtime/runtime'
 import SpeechRecognition, {
 	useSpeechRecognition,
 } from 'react-speech-recognition'
+import UISearchBar from '../UISearchBar/UISearchBar'
 
 export interface UINavBarTopCornerIconProps {
 	key?: string
@@ -50,7 +51,7 @@ type UINavBarProps = {
 	topCornerIcons: UINavBarTopCornerIconProps[]
 }
 
-const defaultProps: UINavBarProps = {
+export const defaultProps: UINavBarProps = {
 	//
 	goBack: false,
 	goBackLabel: '',
@@ -378,6 +379,7 @@ const UINavigation = ({
 						</div>
 
 						{/* Search bar */}
+						{search && <UISearchBar ref={searchBarRef} />}
 						{search && (
 							<div
 								id="searchbar"

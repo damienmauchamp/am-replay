@@ -171,7 +171,7 @@
 
 .uiLargeTitleContainer {
 	@apply defaultPaddingX;
-	@apply self-stretch gap-2.5 flex flex-row justify-start items-start overflow-hidden;
+	@apply self-stretch gap-2.5 flex flex-row justify-start items-center overflow-hidden;
 }
 
 .uiLargeTitle {

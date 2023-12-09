@@ -1,7 +1,8 @@
 import Button from '@/components/AppleMusic/Buttons/Button'
+import UICollectionView from '@/components/AppleMusic/Layout/UICollectionView/UICollectionView'
 import UINavigation, {
 	UINavBarTopCornerIconProps,
-} from '@/components/AppleMusic/UINavigation/UINavigation'
+} from '@/components/AppleMusic/Navigation/UINavigation/UINavigation'
 import TestsNavLinks from '@/components/Tests/TestsNavLinks'
 import { getColor } from '@/helpers/colors'
 import tailwindConfig, { buttonColor, iOSTheme } from '@/tailwind.config'
@@ -131,6 +132,26 @@ export default function navbar() {
 		</>
 	)
 
+	const renderTestCollection = () => {
+		const items = [...Array(16)].map((value, index) => {
+			return (
+				<div
+					key={`ti${index}`}
+					style={{
+						height: index % 2 ? 50 : 40,
+						background: index % 2 ? 'teal' : 'purple',
+					}}
+				>
+					{index}
+				</div>
+			)
+		})
+
+		console.log('items', items)
+
+		return <UICollectionView items={items} />
+	}
+
 	return (
 		<>
 			<UINavigation
@@ -164,6 +185,7 @@ export default function navbar() {
 					</div>
 				}
 			>
+				{renderTestCollection()}
 				{renderTests()}
 			</UINavigation>
 		</>
