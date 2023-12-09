@@ -42,8 +42,11 @@ type UINavBarProps = {
 	faded?: boolean
 	//
 	search?: boolean
+	searchText: string
+	onSearchInput: React.FormEventHandler<HTMLInputElement> | undefined
 	searchPlaceholder?: string
 	speechToText?: boolean
+	onSearchTranscript: (value: string) => void
 	//
 	scrollX?: boolean
 
@@ -57,8 +60,11 @@ export const defaultProps: UINavBarProps = {
 	goBackLabel: '',
 	onBack: () => {},
 	//
+	searchText: '',
 	searchPlaceholder: 'Search',
 	speechToText: true,
+	onSearchInput: (event: React.FormEvent<HTMLInputElement>) => {},
+	onSearchTranscript: (value: string) => {},
 	faded: true,
 	// scrollX: true,
 	topCornerIcons: [] as UINavBarTopCornerIconProps[],
@@ -81,8 +87,11 @@ const UINavigation = ({
 	topCornerIcons,
 	faded,
 	search,
+	onSearchInput,
+	searchText,
 	searchPlaceholder,
 	speechToText,
+	onSearchTranscript,
 	...props
 }: UINavBarProps) => {
 	// region Utils
@@ -132,6 +141,8 @@ const UINavigation = ({
 	// endregion Top bar
 
 	// region Titles toggling
+	const [searchBarIsFixed, setSearchBarIsFixed] = useState<boolean>(false)
+	const searchBarRef = useRef<HTMLDivElement>(null)
 
 	// small title
 	const smallTitleRef = useRef<HTMLDivElement>(null)
@@ -220,66 +231,18 @@ const UINavigation = ({
 	// endregion Titles toggling
 
 	// region SearchBar
-	const defaultSearchText = searchPlaceholder || 'Search' // = ''
-	const [searchbarText, setSearchBarText] = useState<string>(
-		searchPlaceholder || 'Search'
-	)
-	const [searchBarIsFixed, setSearchBarIsFixed] = useState<boolean>(false)
-	const searchBarRef = useRef<HTMLDivElement>(null)
+	const defaultSearchText = ''
+	const [searchbarText, setSearchBarText] = useState<string>(searchText)
 	// endregion SearchBar
 
-	// region SpeechToText
-	if (speechToText === undefined) {
-		speechToText = true
-	}
-
-	const {
-		transcript,
-		browserSupportsSpeechRecognition,
-		isMicrophoneAvailable,
-	} = useSpeechRecognition()
-
-	const [speechToTextEnabled, setSpeechToTextEnabled] =
-		useState<boolean>(speechToText)
-	const [speechToTextIsListening, setSpeechToTextIsListening] =
-		useState<boolean>(false)
-
-	const startListening = (e: Event) => {
-		console.log('startListening')
-		if (!isMicrophoneAvailable || !speechToTextEnabled) {
-			// todo : handle error ?
-			setSpeechToTextEnabled(false)
-			console.error('Mic not available')
-			return
-		}
-		setSpeechToTextIsListening(true)
-		SpeechRecognition.startListening()
-	}
-	const stopListening = (e: Event) => {
-		console.log('stopListening')
-		setSpeechToTextIsListening(false)
-		SpeechRecognition.stopListening()
-		updateSearchText(transcript)
-	}
-
-	const updateSearchText = (text: string) =>
+	const updateSearchText = (text: string) => {
+		console.log('updateSearchText', text)
 		setSearchBarText(text || defaultSearchText)
-
+	}
 	useEffect(() => {
-		if (!browserSupportsSpeechRecognition) {
-			setSpeechToTextEnabled(false)
-		}
-	}, [])
-	useEffect(() => {
-		if (speechToText !== undefined) {
-			setSpeechToTextEnabled(speechToText)
-		}
-	}, [speechToText])
-	useEffect(() => {
-		updateSearchText(transcript)
-	}, [transcript])
-
-	// endregion SpeechToText
+		console.log('uE:', searchText)
+		updateSearchText(searchText)
+	}, [searchText])
 
 	return (
 		<div className="w-full h-[100vh] flex" style={{}}>
@@ -379,7 +342,30 @@ const UINavigation = ({
 						</div>
 
 						{/* Search bar */}
-						{search && <UISearchBar ref={searchBarRef} />}
+						{/* {search && 'searchText:' + searchText} */}
+						{search && (
+							<UISearchBar
+								id="searchbar"
+								ref={searchBarRef}
+								value={searchbarText}
+								speechToText={speechToText}
+								placeholder={searchPlaceholder}
+								data-fixed={Number(searchBarIsFixed)}
+								onInput={
+									(e) => {
+										console.log('UINav SonInput:', e)
+										onSearchInput && onSearchInput(e)
+										updateSearchText(e.currentTarget.value)
+									}
+									// setSearchBarText(e.currentTarget.value)
+								}
+								onTranscript={(value: string) => {
+									console.log('UINav SonTranscript:', value)
+									onSearchTranscript(value)
+								}}
+								// speechToText={speechToTextEnabled}
+							/>
+						)}
 						{search && (
 							<div
 								id="searchbar"
@@ -396,30 +382,24 @@ const UINavigation = ({
 									</div>
 									<div className="text-center text-zinc-700 text-opacity-60 text-[17px] font-normal leading-snug">
 										<div>
-											{(speechToTextEnabled && (
+											{(speechToText && (
 												<IoMic
 													size={18}
 													// data-enabled={Number(
 													// 	speechToText
 													// )}
-													className={`${
-														styles.uiSearchBarSpeechToText
-													} ${
-														speechToTextIsListening
-															? 'text-green'
-															: ''
-													}`}
-													onClick={(e: Event) =>
-														speechToTextEnabled
-															? speechToTextIsListening
-																? stopListening(
-																		e
-																  )
-																: startListening(
-																		e
-																  )
-															: {}
-													}
+													className={`${styles.uiSearchBarSpeechToText}`}
+													// onClick={(e: Event) =>
+													// 	speechToTextEnabled
+													// 		? speechToTextIsListening
+													// 			? stopListening(
+													// 					e
+													// 			  )
+													// 			: startListening(
+													// 					e
+													// 			  )
+													// 		: {}
+													// }
 												/>
 											)) ||
 												''}
@@ -454,7 +434,7 @@ const UINavigation = ({
 										searchBarIsFixed:{' '}
 										{Number(searchBarIsFixed)}
 									</p>
-									<p>transcript : {transcript}</p>
+									{/* <p>transcript : {transcript}</p> */}
 									<p>
 										speechToText :{' '}
 										{speechToText !== undefined
@@ -463,8 +443,8 @@ const UINavigation = ({
 									</p>
 									<p>
 										speechToTextEnabled :{' '}
-										{speechToTextEnabled !== undefined
-											? Number(speechToTextEnabled)
+										{speechToText !== undefined
+											? Number(speechToText)
 											: 'undefined'}
 									</p>
 									<div className="my-96"></div>

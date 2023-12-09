@@ -124,8 +124,34 @@ const config: Config = {
 			colors: {
 				primaryColor: primaryColor,
 				buttonColor: buttonColor,
+				// searchInputBg: {
+				// 	light: '#EEEEEF',
+				// 	DEFAULT: '#EEEEEF',
+				// 	dark: '#1c1c1e',
+				// },
+				searchInputBg: {
+					light: '#71717a', // zinc-500
+					DEFAULT: '#71717a', // zinc-500
+					dark: '#1c1c1e', // todo
+				},
+				searchInputText: {
+					light: '#333333', // zinc-700
+					DEFAULT: '#333333', // zinc-700
+					dark: '#98989f', // todo
+				},
+				// searchInputText: {
+				// 	light: '#838388',
+				// 	DEFAULT: '#838388',
+				// 	dark: '#98989f',
+				// },
+				// searchInputBg: iOSTheme.color.grey,
+				// searchInputText: iOSTheme.color.grey,
 				// iOS17
 				...iOSTheme.color,
+			},
+			spacing: {
+				// uiNavigation: '1rem' // px-4
+				uiNavigation: '1.25rem', // px-5
 			},
 		},
 	},

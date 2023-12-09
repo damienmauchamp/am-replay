@@ -22,10 +22,12 @@ export default function navbar() {
 	const [goBack, setGoBack] = useState<boolean>(true)
 	const [goBackLabel, setGoBackLabel] = useState<string>('Retour')
 	const onBack = () => console.log('onBack()')
+	const [searchText, setSearchText] = useState<string>('ddff')
 	const [searchPlaceholder, setSearchPlaceholder] = useState<string>(
 		'Rechercher dans les playlists'
 	)
 	const [speechToText, setSpeechToText] = useState<boolean>(true)
+	const [transcript, setTranscript] = useState<string>('')
 	const [topIconActive, setTopIconActive] = useState<boolean>(true)
 
 	const topCornerIcons = [
@@ -81,6 +83,22 @@ export default function navbar() {
 					>
 						SpeechToText : {Number(speechToText)}
 					</Button>
+
+					<div>
+						<label>
+							searchText :
+							<input
+								type="text"
+								name="searchText"
+								value={searchText}
+								onInput={({ currentTarget }) => {
+									setSearchText(currentTarget.value)
+								}}
+							/>
+						</label>
+					</div>
+
+					<p>transcript : {transcript} </p>
 
 					<div>
 						<label>
@@ -157,6 +175,13 @@ export default function navbar() {
 			<UINavigation
 				title={title}
 				search={search}
+				searchText={searchText}
+				onSearchInput={(e) => {
+					setSearchText(e.currentTarget.value)
+				}}
+				onSearchTranscript={(value) => {
+					setTranscript(value)
+				}}
 				goBack={goBack}
 				goBackLabel={goBackLabel}
 				onBack={onBack}
@@ -185,8 +210,8 @@ export default function navbar() {
 					</div>
 				}
 			>
-				{renderTestCollection()}
 				{renderTests()}
+				{renderTestCollection()}
 			</UINavigation>
 		</>
 	)

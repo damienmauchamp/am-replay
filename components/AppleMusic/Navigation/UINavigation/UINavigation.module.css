@@ -102,9 +102,7 @@
 /* UITop rightIcon */
 .uiRightIcon {
 	@apply inline-flex justify-end items-center gap-4;
-	/* todo : global variable */
-	/* @apply defaultPaddingX; */
-	@apply pr-5;
+	@apply pr-uiNavigation;
 }
 
 .uiTopRightIcons {
@@ -135,7 +133,7 @@
 /* UIBottom Top Content */
 
 .uiBottomTopContent {
-	@apply defaultPaddingX;
+	@apply px-uiNavigation;
 }
 
 /* UIBottom Top */
@@ -170,7 +168,7 @@
 /* UIBottom Top LargeTitle */
 
 .uiLargeTitleContainer {
-	@apply defaultPaddingX;
+	@apply px-uiNavigation;
 	@apply self-stretch gap-2.5 flex flex-row justify-start items-center overflow-hidden;
 }
 
@@ -192,7 +190,7 @@
 	@apply self-stretch;
 	@apply flex flex-col justify-start items-start;
 	/* todo : global variable */
-	@apply defaultPaddingX pt-2 pb-[15px];
+	@apply px-uiNavigation pt-2 pb-[15px];
 }
 
 .searchbar[data-fixed='1'] {
@@ -207,7 +205,7 @@
 
 .content {
 	@apply contentBackground;
-	@apply defaultPaddingX defaultPaddingY;
+	@apply px-uiNavigation defaultPaddingY;
 	/* todo : global variable */
 	@apply self-stretch overflow-auto;
 	/* @apply flex w-full text-black font-normal bg-grey; */
