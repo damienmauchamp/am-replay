@@ -1,22 +1,14 @@
 import { NextPage } from 'next'
 import { Nav } from '@/components/Nav/Nav'
 import { Home } from '@/components/Home/Home'
-import { logDebug } from '@/helpers/debug'
-import {
-	MusicKitContextProvider,
-	useMusicKitContext,
-} from '@/context/MusicKitContext'
+import { MusicKitContextProvider } from '@/context/MusicKitContext'
 import TestsNavLinks from '@/components/Tests/TestsNavLinks'
 import Head from 'next/head'
 
-const log = (...args: any) => {
-	logDebug('index', 'cyan', ...args)
-}
+interface LandingProps {}
 
 // todo : Error wrap if error while loading musicKit
-const Landing: NextPage<{}> = () => {
-	const { logged } = useMusicKitContext()
-
+const Landing: NextPage<LandingProps> = () => {
 	return (
 		<MusicKitContextProvider>
 			<>
