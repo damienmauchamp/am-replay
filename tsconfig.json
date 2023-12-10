@@ -19,8 +19,8 @@
 		"typeRoots": [
 			"node_modules/musickit-typescript",
 			"node_modules/@types",
-			"types"
-			// "types/**"
+			"types",
+			"types/react-color-extractor"
 		]
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
