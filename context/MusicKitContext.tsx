@@ -20,6 +20,8 @@ interface MusicKitContextProps {
 	updateLogin: Function
 	getInstance: Function
 	isAuthorized: Function
+	musicKit: MusicKit.MusicKitInstance
+	setMusicKit: React.Dispatch<React.SetStateAction<MusicKitInstance>>
 }
 
 const defaultMusicKit = {} as MusicKit.MusicKitInstance
@@ -38,6 +40,10 @@ const defaultContext = {
 	updateLogin: () => {},
 	getInstance: getInstance,
 	isAuthorized: isAuthorized,
+	musicKit: defaultMusicKit,
+	setMusicKit: (() => {}) as React.Dispatch<
+		React.SetStateAction<MusicKitInstance>
+	>,
 }
 
 const MusicKitContext = createContext<MusicKitContextProps>(defaultContext)
@@ -47,6 +53,8 @@ export const MusicKitContextProvider = ({
 	...props
 }: MusicKitContextProviderProps) => {
 	const [logged, setLogged] = useState<boolean>(isAuthorized())
+	const [musicKit, setMusicKit] =
+		useState<MusicKit.MusicKitInstance>(defaultMusicKit)
 
 	const updateLogin = (testing: boolean = false) => {
 		if (testing) {
@@ -58,7 +66,14 @@ export const MusicKitContextProvider = ({
 
 	return (
 		<MusicKitContext.Provider
-			value={{ logged, updateLogin, getInstance, isAuthorized }}
+			value={{
+				logged,
+				updateLogin,
+				getInstance,
+				isAuthorized,
+				musicKit,
+				setMusicKit,
+			}}
 		>
 			{children}
 		</MusicKitContext.Provider>
