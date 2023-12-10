@@ -1,8 +1,6 @@
 import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
 import { Nav } from '@/components/Nav/Nav'
 import { Home } from '@/components/Home/Home'
-import MusicKitProvider from '@/components/Providers/MusicKitProvider'
 import { logDebug } from '@/helpers/debug'
 import {
 	MusicKitContextProvider,
