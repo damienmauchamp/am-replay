@@ -1,5 +1,5 @@
 import classes from './SegmentedControls.module.css'
-import React, { CSSProperties, useEffect, useRef, useState } from 'react'
+import React, {CSSProperties, useEffect, useRef, useState} from 'react'
 
 // region props
 export interface SegmentedControlsProps {
@@ -13,7 +13,7 @@ export interface SegmentedControlsProps {
 	style?: CSSProperties
 	name: string
 	controlRef: any
-	resize: boolean
+	resize?: boolean
 }
 
 export interface SegmentedControlsItem {
@@ -24,25 +24,26 @@ export interface SegmentedControlsItem {
 
 const defaultProps: SegmentedControlsProps = {
 	selected: 0,
-	onSelect: () => {},
+	onSelect: () => {
+	},
 	items: [],
 	// labels: [],
 	style: {},
 	name: String(`sc-${Date.now() * Math.random()}`),
-	controlRef: { current: null },
+	controlRef: {current: null},
 	resize: true,
 }
 // endregion props
 
 const SegmentedControls = ({
-	items,
-	// labels,
-	onSelect,
-	name,
-	controlRef,
-	resize,
-	...props
-}: SegmentedControlsProps) => {
+							   items,
+							   // labels,
+							   onSelect,
+							   name,
+							   controlRef,
+							   resize,
+							   ...props
+						   }: SegmentedControlsProps) => {
 	const [selected, setSelected] = useState<number>(props.selected || 0)
 	const uniqid = name + String(Date.now() * Math.random())
 	const componentReady = useRef(false)
@@ -131,8 +132,8 @@ const SegmentedControls = ({
 		}
 
 		const activeSegmentRef = items[selected].ref
-		const { offsetWidth, offsetLeft } = activeSegmentRef.current
-		const { style } = controlRef.current
+		const {offsetWidth, offsetLeft} = activeSegmentRef.current
+		const {style} = controlRef.current
 
 		style.setProperty('--highlight-width', `${offsetWidth}px`)
 		style.setProperty('--highlight-x-pos', `${offsetLeft}px`)
@@ -155,13 +156,13 @@ const SegmentedControls = ({
 		<div
 			ref={controlRef}
 			className={`controls-container ${classes.container}`}
-			style={props.style && { ...props.style }}
+			style={props.style && {...props.style}}
 		>
 			<div
 				className={`controls ${classes.controls} ${classes.segment}  ${
 					componentReady.current ? 'ready' : 'idle'
 				}`}
-				style={props.style && { ...props.style }}
+				style={props.style && {...props.style}}
 			>
 				{items.map((x, i) => (
 					<React.Fragment key={`fragment-${name}-${i}`}>

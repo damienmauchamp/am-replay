@@ -20,6 +20,12 @@ const log = (...args: any) => {
 	logDebug('AlbumPicker', 'teal', ...args)
 }
 
+const DATATYPE_CODE = 'DataType'
+const STORAGE_KEY = 'amrStoragePicker'
+const STORAGE_EXPIRING = false
+const STORAGE_MINS = 3600
+const CURRENT_YEAR = new Date().getFullYear()
+
 interface AlbumPickerProps {
 }
 
@@ -29,12 +35,13 @@ type YearType = {
 	todo: string[]
 	skipped: string[]
 }
-
-// type YearsType = {
-// 	[]
-// }
-
-const DATATYPE_CODE = 'DataType'
+type APIDataType = {
+	page: number
+}
+type ActionType = {
+	timestamp: number
+	action: string
+}
 type DataType = {
 	// years: YearType[]
 	years: { [year: number]: YearType }
@@ -44,31 +51,52 @@ type DataType = {
 	timestamp: number
 	lastUpdate: number
 	lastAction: string
+	currentYear: number
+	actions: ActionType[]
 	type: string
+	api: APIDataType
 }
 
-const STORAGE_KEY = 'amrStoragePicker'
-const STORAGE_MINS = 3600
+// todo : cache, localStorage, save before closing, button save, ...
+const DEFAULT_YEAR_TYPE: APIDataType = {
+	page: 1
+}
 
-const DEFAULT_YEARLY: YearType = {
+// const DEFAULT_YEARLY: YearType = {
+// 	albums: [] as LibraryAlbum[],
+// 	picked: [] as string[],
+// 	todo: [] as string[],
+// 	skipped: [] as string[],
+// 	// api: {...DEFAULT_YEAR_TYPE} as APIDataType,
+// }
+
+const getDefaultYearlyState = () => ({
 	albums: [] as LibraryAlbum[],
 	picked: [] as string[],
 	todo: [] as string[],
 	skipped: [] as string[],
-}
+
+	// const array = DEFAULT_YEARLY
+	// array.albums =[]
+	// array.picked =[]
+	// array.todo =[]
+	// array.skipped =[]
+	// return DEFAULT_YEARLY
+	// return {...DEFAULT_YEARLY}
+	// return {...DEFAULT_YEARLY, api: {...DEFAULT_YEAR_TYPE}}
+})
 
 const getDefaultState = (year: number): DataType => ({
 	years: {
-		[year]: DEFAULT_YEARLY,
+		[year]: getDefaultYearlyState(),
 	},
-	// todo : cache, localStorage, save before closing, button save, ...
-	// cache: {
-	// 	page: null,
-	// },
 	timestamp: Date.now(),
 	lastUpdate: Date.now(),
+	currentYear: CURRENT_YEAR,
+	actions: [],
 	lastAction: 'init',
 	type: DATATYPE_CODE,
+	api: DEFAULT_YEAR_TYPE,
 })
 
 const isDataType = (obj: any): obj is DataType => {
@@ -86,7 +114,6 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 
 	const [albumLoading, setAlbumLoading] = useState<boolean>(false)
 
-	const [apiPage, setApiPage] = useState<number>(1)
 	const [fetchComplete, setFetchComplete] = useState<boolean>(false)
 	const [loop, setLoop] = useState<boolean>(false)
 
@@ -108,15 +135,70 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 			ref: useRef(),
 		},
 	]
-	const [year, setYear] = useState<number>(new Date().getFullYear())
 	const [tab, setTab] = useState<number>(0)
+
+	// region Year
+	const [needsToFetchAlbums, setNeedsToFetchAlbums] = useState<boolean>(false)
+	const [year, setYear] = useState<number>(CURRENT_YEAR)
+	const yearRef = useRef<HTMLSelectElement>(null);
+	const startYear = 1950;
+	const yearRange = () => {
+		let years = []
+		for (let y = startYear; y <= CURRENT_YEAR; y++) {
+			years.push(y)
+		}
+		return years
+	}
+	const initYearAlbum = (newYear?: number, save: boolean = true) => {
+		let newData = data
+		newYear = newYear || year
+		if (!newData.years[newYear]) {
+			newData.years[newYear] = getDefaultYearlyState()
+		}
+		if (save) {
+			updateData(newData, `setYearTo${newYear}`)
+		}
+		return newData
+	}
+	const onYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		// console.clear()
+		setYear(Number(event.currentTarget.value))
+	}
+
+	useEffect(() => {
+		console.log('YEAR CHANGED', year)
+
+		// readying data for the new year
+		initYearAlbum()
+
+		// need to fetch if no next
+		if (!getNextAlbum()) {
+			console.log('need to fetch')
+			loadAlbums() // todo : fetch until
+		}
+
+		// reset displayedId
+		// setDisplayedAlbumId(0)
+
+		console.log('DONE YEAR CHANGE')
+	}, [year])
+
+	// region YearAPI
+	const [apiPage, setApiPage] = useState<number>(1)
+	// const getApiPage = (apiYear?: number | string) => {
+	// 	apiYear = Number(apiYear || year)
+	// 	return data.years[apiYear]?.api?.page || 1
+	// }
+	// endregion YearAPI
+
+	// endregion Year
 
 	const loadAllAlbums = () => {
 		setAlbumFetching(true)
 		setLoop(true)
 	}
 
-	const loadAlbums = (data: any = {}) => {
+	const loadAlbums = (options: any = {}) => {
 		log(
 			'loadAlbums',
 			{
@@ -127,9 +209,9 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 				apiPage: apiPage,
 				loop: loop,
 				loopMaxPage: loopMaxPage,
-				data: data,
+				options: options,
 			},
-			data
+			options
 		)
 
 		if (!logged || !isAuthorized()) {
@@ -146,13 +228,18 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 		log('loadAlbums: getInstance().api', getInstance().api)
 		log('loadAlbums: getInstance().api.library', getInstance().api.library)
 		log('loadAlbums: [albums] params:', params)
+		log('loadAlbums: [albums] year:', year)
+		log('loadAlbums: [albums] options:', options)
+
+		let loopData = data;
+		log('loadAlbums[V]: loopData', JSON.stringify(loopData))
 
 		return getInstance()
 			.api.library.albums(null, params)
 			.then((response: MusicKit.Resource[]) => {
 				log('loadAlbums OK: response', response)
 
-				if (response !== undefined && !response.length) {
+				if (response !== undefined && !response.length || !response) {
 					log('loadAlbums COMPLETE')
 					setFetchComplete(true)
 					setAlbumLoading(false)
@@ -160,29 +247,44 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 					return
 				}
 
-				const libraryAlbums: LibraryAlbum[] = response as LibraryAlbum[]
-
-				// filtering
-				const currentAlbumIds = albums.map((a) => a.id)
-				console.log('currentAlbumIds', currentAlbumIds)
-				const uniqueAlbums: LibraryAlbum[] = libraryAlbums.filter(
-					(a) => !currentAlbumIds.includes(a.id)
-				)
-				const onlyAlbums: LibraryAlbum[] = uniqueAlbums.filter(
+				const libraryAlbums: LibraryAlbum[] = response.filter(
 					(a) =>
 						!String(a.attributes.name).endsWith('- Single') &&
-						!String(a.attributes.name).endsWith('- EP')
+						!String(a.attributes.name).endsWith('- EP') &&
+						a.attributes.releaseDate
 					// && String(a.attributes.artwork.url)
-				)
-				const yearAlbums: LibraryAlbum[] = onlyAlbums.filter((a) =>
-					String(a.attributes.releaseDate).startsWith(`${year}-`)
-				)
+				) as LibraryAlbum[]
 
-				if (yearAlbums.length) {
-					log('loadAlbums[V]: setAlbums:', [...albums, ...yearAlbums])
-					updateAlbums(yearAlbums)
-					// setAlbums([...albums, ...yearAlbums])
+				log('loadAlbums[V]: libraryAlbums', libraryAlbums)
+
+				libraryAlbums.forEach(newAlbum => {
+					const albumReleaseDate = newAlbum.attributes.releaseDate;
+					const matches = String(albumReleaseDate).match(/(\d{4})-\d{2}-\d{2}/)
+					if (!matches) {
+						return true;
+					}
+
+					const albumYear = Number(matches[1]);
+					if (!loopData.years[albumYear]) {
+						loopData = initYearAlbum(albumYear, false)
+					}
+
+					if (loopData.years[albumYear].albums.find((a: LibraryAlbum) => a.id === newAlbum.id)) {
+						// already in there
+						return true;
+					}
+
+					// ok
+					loopData.years[albumYear].albums.push(newAlbum)
+				})
+				log('loadAlbums[V]: loopData:', loopData)
+				if (!loopData) {
+					console.error('nOOOOOOOOOOO loopData')
+					return false;
 				}
+
+				updateData(loopData, 'fetching')
+
 				setAlbumLoading(false)
 				setApiPage(apiPage + 1)
 
@@ -238,8 +340,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 
 	const resetPage = () => {
 		stopLoading()
-		// updateAlbums([], true)
-		updateData(getDefaultState(year))
+		updateData(getDefaultState(year), 'resetPage')
 		setDisplayedAlbumId(0)
 		setApiPage(1)
 	}
@@ -250,8 +351,6 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 		// if (getStorageData()) {
 		// 	setData(getStorageData())
 		// }
-		console.log('getStorageData', getStorageData())
-		console.log('initData', initData())
 		if (logged && isAuthorized()) {
 			const init = initData()
 			updateData(init, 'initData')
@@ -268,8 +367,20 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 		}
 	}, [])
 
+	const updateApiPage = () => {
+		updateData({...data, api: apiPage}, `setApiPage(${apiPage},${year}):`)
+	}
 	useEffect(() => {
-		console.log(`Component AlbumPicker updated.`)
+		console.log('API PAGE CHANGED', apiPage)
+
+		updateApiPage()
+
+	}, [apiPage])
+
+	useEffect(() => {
+		console.log('API/LOOP PAGE CHANGED', apiPage, loop, {
+			needsToFetchAlbums: needsToFetchAlbums,
+		})
 
 		if (!loop) {
 			setAlbumFetching(false)
@@ -290,6 +401,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 
 		loopPages.push(apiPage)
 
+		// todo : if !isFetching?
 		loadAlbums()
 	}, [apiPage, loop])
 
@@ -327,29 +439,48 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 
 	const initData = () => {
 		const storage = getStorageData()
-		const isValid =
-			storage &&
+		const isValid = !STORAGE_EXPIRING && storage &&
 			moment().diff(moment(storage?.lastUpdate), 'minutes') < STORAGE_MINS
-		console.log('[init] isValid:', isValid, storage)
 		return isValid ? storage : getDefaultState(year)
 	}
 
-	const updateData = (newData: any, action: string = 'update') => {
-		newData.lastUpdate = Date.now()
+	const updateData = (newData: any, action: string = 'update', yearData?: number | string) => {
+		const timestamp = Date.now();
+		newData.lastUpdate = timestamp
 		newData.lastAction = action
+
+		newData.actions = newData.actions || []
+		newData.actions.push({
+			timestamp: timestamp,
+			action: action,
+		})
+
+		yearData = yearData || year
+
+		setAlbums(newData.years[yearData].albums)
 		setData(newData)
 		setStorageData(newData)
-		setAlbums(newData.years[year].albums)
+		// setApiPage(getApiPage(yearData))
 	}
 
+	useEffect(() => {
+		console.log('DATA CHANGED')
+	}, [data]);
+	useEffect(() => {
+		console.log('ALBUMS CHANGED')
+		getNextAlbum()
+	}, [albums]);
+
 	const updateAlbums = (
-		newAlbums: LibraryAlbum[],
-		reset: boolean = false
+		newAlbums: LibraryAlbum[]
 	) => {
-		const tmp = [...albums, ...newAlbums]
+		// const tmp = [...albums, ...newAlbums]
 
 		const dataX = data
-		dataX.years[year].albums = tmp
+
+		// dataX.years[year].albums = tmp
+		log('loadAlbums[V]: updateAlbums:', [...dataX.years[year].albums, ...newAlbums])
+		dataX.years[year].albums = [...dataX.years[year].albums, ...newAlbums]
 		updateData(dataX, 'albumUpdate')
 
 		// setAlbums(tmp)
@@ -415,6 +546,10 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 	}
 
 	const getAlbumCategory = (albumId: string) => {
+		if (!data.years[year]) {
+			return null;
+		}
+
 		let actionId = null
 		libraryYearKeys.every((element, index) => {
 			if (
@@ -426,14 +561,10 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 			}
 			return true
 		})
-
-		console.log('getAlbumCategory =>', albumId, actionId)
 		return actionId
 	}
 
-	const albumHasCategory = (albumId: string) => {
-		return getAlbumCategory(albumId) ? true : false
-	}
+	const albumHasCategory = (albumId: string) => !!getAlbumCategory(albumId)
 
 	const getFirstAlbumIdWithoutCategory = () => {
 		// todo : start from displayedId ?
@@ -574,7 +705,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 
 	const renderTopButtons = () => {
 		return (
-			<ul className="flex flex-row flex-wrap gap-2 justify-center py-2">
+			<ul className="grid grid-cols-2 md:grid-cols-4 gap-2 justify-center py-2">
 				<li>
 					<Button Style="Filled" onClick={() => loadAlbums()}>
 						loadAlbums()
@@ -624,29 +755,23 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 	// region test
 
 	const getNextAlbum = () => {
-		const next = albums[displayedAlbumId]
-		if (next && !albumHasCategory(next.id)) {
-			console.log('getNextAlbum.next', next)
-			return next
+
+		const allllllll = data.years[year]?.albums || []
+		const nextIndex = getFirstAlbumIdWithoutCategory()
+
+		if (nextIndex === null) {
+			return false
 		}
 
-		const nextIndex = getFirstAlbumIdWithoutCategory()
-		if (
-			nextIndex !== null &&
-			albums[nextIndex] &&
-			!albumHasCategory(nextIndex)
-		) {
-			setDisplayedAlbumId(nextIndex)
-			return albums[nextIndex]
+		if (allllllll[nextIndex]) {
+			if (displayedAlbumId !== nextIndex) {
+				setDisplayedAlbumId(nextIndex)
+			}
+			return allllllll[nextIndex]
 		}
 		return false
 	}
 	const renderAlbums = () => {
-		console.log('renderAlbums albums.length:', albums.length)
-
-		getNextAlbum()
-		console.log('displayedAlbumId', displayedAlbumId)
-
 		return albums.length ? (
 			getNextAlbum() ? (
 				<>
@@ -776,20 +901,20 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 				</section>
 
 				<section
-					className="flex flex-col justify-center"
+					className="flex flex-col  "
 					id="albumsOld"
 				>
-					<div>
-						<h3>Albums {albumLoading ? '(LOADING...)' : ''}</h3>
-					</div>
+					<h3>Albums {albumLoading ? '(LOADING...)' : ''}</h3>
+					<div className='flex flex-col justify-center items-center'>
 
-					<div className="max-w-sm">
-						{renderAlbums()}
+						<div className="flex flex-col gap-4 max-w-sm">
+							{renderAlbums()}
 
-						{/* Action buttons */}
-						{actionButtons()}
+							{/* Action buttons */}
+							{actionButtons()}
 
-						{renderTotal()}
+							{renderTotal()}
+						</div>
 					</div>
 				</section>
 
@@ -832,7 +957,16 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 		return (
 			<>
 				<div className={styles.page}>
-					<h2>Hello</h2>
+					<h2>Current year : {year} (p. {apiPage})</h2>
+
+					<select ref={yearRef}
+						style={{background: 'black', color: 'white'}}
+						value={year}
+						onChange={onYearChange}>
+						{yearRange().map(y => {
+							return <option key={y} value={y}>{y}</option>
+						})}
+					</select>
 
 					<SegmentedControls
 						controlRef={tabsRef}
@@ -852,8 +986,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 							1,
 							<TopTab
 								identifier="picked"
-								albums={data.years[year].albums}
-								picked={data.years[year].picked}
+								albums={data.years[year]?.albums || []}
+								picked={data.years[year]?.picked || []}
 								//
 								canCancel={true}
 								onCancel={onAlbumTabCancel}
@@ -867,8 +1001,8 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
 							2,
 							<TodoTab
 								identifier="todo"
-								albums={data.years[year].albums}
-								todo={data.years[year].todo}
+								albums={data.years[year]?.albums || []}
+								todo={data.years[year]?.todo || []}
 								//
 								canCancel={true}
 								onCancel={onAlbumTabCancel}
