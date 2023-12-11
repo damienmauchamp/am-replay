@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import classes from './LoginButton.module.css'
 import Button from '@/components/AppleMusic/Buttons/Button'
-import { IoLogInOutline, IoPerson } from 'react-icons/io5'
-import { logDebug } from '@/helpers/debug'
-import { useMusicKitContext } from '@/context/MusicKitContext'
+import {IoLogInOutline, IoPerson} from 'react-icons/io5'
+import {logDebug} from '@/helpers/debug'
+import {useMusicKitContext} from '@/context/MusicKitContext'
 
 const log = (...args: any) => {
 	logDebug('LoginButton', 'pink', ...args)
@@ -13,9 +13,9 @@ interface LoginButtonProps {
 	onLogin?: () => void
 }
 
-const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
-	const { logged, getInstance, updateLogin } = useMusicKitContext()
-	const [loading, setLoading] = useState<boolean>(true)
+const LoginButton: React.FC<LoginButtonProps> = ({...props}) => {
+	const {loading, logged, getInstance, updateLogin} = useMusicKitContext()
+	const [buttonLoading, setButtonLoading] = useState<boolean>(loading)
 	const [isLogging, setIsLogging] = useState<boolean>(false)
 
 	const afterLogin = () => {
@@ -29,6 +29,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 		if (getInstance().isAuthorized) {
 			// Already logged
 			log('(handleLogin) Already logged')
+			updateLogin()
 			return
 		}
 
@@ -51,14 +52,16 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 	}
 
 	useEffect(() => {
-		// 	setTimeout(() => {
-		setLoading(false)
-		// 	}, 500)
+		setButtonLoading(loading)
 	}, [])
+
+	useEffect(() => {
+		setButtonLoading(loading)
+	}, [loading])
 
 	return (
 		<>
-			{loading ? (
+			{buttonLoading ? (
 				<div>loading...</div>
 			) : (
 				<Button
@@ -66,8 +69,8 @@ const LoginButton: React.FC<LoginButtonProps> = ({ ...props }) => {
 						logged
 							? classes.buttonBgConnected
 							: isLogging
-							  ? classes.buttonBgLogging
-							  : classes.buttonBg
+								? classes.buttonBgLogging
+								: classes.buttonBg
 					}
 					onClick={handleLogin}
 					Icon={logged ? IoPerson : IoLogInOutline}

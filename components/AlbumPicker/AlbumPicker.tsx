@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import LibraryAlbum from '../Elements/LibraryAlbum/LibraryAlbum'
 import Button from '../AppleMusic/Buttons/Button'
-import { IoArrowBack, IoArrowForward } from 'react-icons/io5'
-import { logDebug } from '@/helpers/debug'
-import { useMusicKitContext } from '@/context/MusicKitContext'
-import tailwindConfig, { iOSTheme } from '@/tailwind.config'
+import {IoArrowBack, IoArrowForward} from 'react-icons/io5'
+import {logDebug} from '@/helpers/debug'
+import {useMusicKitContext} from '@/context/MusicKitContext'
+import tailwindConfig, {iOSTheme} from '@/tailwind.config'
 import TinderCard from 'react-tinder-card'
 import SegmentedControls from '../AppleMusic/SegmentedControls/SegmentedControls'
 import styles from './AlbumPicker.module.css'
@@ -20,7 +20,8 @@ const log = (...args: any) => {
 	logDebug('AlbumPicker', 'teal', ...args)
 }
 
-interface AlbumPickerProps {}
+interface AlbumPickerProps {
+}
 
 type YearType = {
 	albums: LibraryAlbum[]
@@ -74,8 +75,8 @@ const isDataType = (obj: any): obj is DataType => {
 	return obj.type === DATATYPE_CODE
 }
 
-const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
-	const { logged, getInstance, isAuthorized } = useMusicKitContext()
+const AlbumPicker: React.FC<AlbumPickerProps> = ({...props}) => {
+	const {loading, logged, getInstance, isAuthorized} = useMusicKitContext()
 	const [display, setDisplay] = useState<boolean>(false)
 
 	const apiLimit = 100,
@@ -83,7 +84,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 
 	let loopPages: number[] = []
 
-	const [loading, setLoading] = useState<boolean>(false)
+	const [albumLoading, setAlbumLoading] = useState<boolean>(false)
 
 	const [apiPage, setApiPage] = useState<number>(1)
 	const [fetchComplete, setFetchComplete] = useState<boolean>(false)
@@ -100,7 +101,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			value: 'picker',
 			ref: useRef(),
 		},
-		{ label: 'Top', value: 'top', ref: useRef() },
+		{label: 'Top', value: 'top', ref: useRef()},
 		{
 			label: 'Todolist',
 			value: 'todolist',
@@ -135,7 +136,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			return
 		}
 
-		setLoading(true)
+		setAlbumLoading(true)
 
 		const params: MusicKit.QueryParameters = {
 			limit: apiLimit,
@@ -154,7 +155,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 				if (response !== undefined && !response.length) {
 					log('loadAlbums COMPLETE')
 					setFetchComplete(true)
-					setLoading(false)
+					setAlbumLoading(false)
 					setAlbumFetching(false)
 					return
 				}
@@ -182,7 +183,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 					updateAlbums(yearAlbums)
 					// setAlbums([...albums, ...yearAlbums])
 				}
-				setLoading(false)
+				setAlbumLoading(false)
 				setApiPage(apiPage + 1)
 
 				log('loadAlbums[V]: albums:', albums)
@@ -190,7 +191,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			})
 			.catch((error: any) => {
 				console.error('loadAlbums OK: error', error)
-				setLoading(false)
+				setAlbumLoading(false)
 			})
 	}
 
@@ -734,16 +735,16 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 			<div className={''}>
 				<h2>Year : {year}</h2>
 				<ul>
-					<hr />
+					<hr/>
 					<li>
 						Albums counts : {data.years[year]?.albums?.length || 0}
 					</li>
 					<li>Picked : {data.years[year]?.picked?.length || 0}</li>
 					<li>TODO : {data.years[year]?.todo?.length || 0}</li>
 					<li>Skipped : {data.years[year]?.skipped?.length || 0}</li>
-					<hr />
+					<hr/>
 					<li>Displayed ID : {displayedAlbumId}</li>
-					<hr />
+					<hr/>
 				</ul>
 			</div>
 		)
@@ -779,7 +780,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 					id="albumsOld"
 				>
 					<div>
-						<h3>Albums {loading ? '(LOADING...)' : ''}</h3>
+						<h3>Albums {albumLoading ? '(LOADING...)' : ''}</h3>
 					</div>
 
 					<div className="max-w-sm">
@@ -793,7 +794,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 				</section>
 
 				<section id="albums">
-					<h3>Albums cards {loading ? '(LOADING...)' : ''}</h3>
+					<h3>Albums cards {albumLoading ? '(LOADING...)' : ''}</h3>
 
 					{/* <div className="py-4"> */}
 					{renderNewAlbums()}
@@ -881,7 +882,7 @@ const AlbumPicker: React.FC<AlbumPickerProps> = ({ ...props }) => {
 		)
 	}
 
-	return <>{(display && render()) || 'Please log in'}</>
+	return <>{(display && render()) || (loading && 'Loading...') || 'Please log in'}</>
 }
 
 export default AlbumPicker
