@@ -1,5 +1,9 @@
 # AM Replay
 
+Testing stuff, using Apple Music API, MusicKit API & React.
+
+See [apple-music-plus-frontend](https://github.com/damienmauchamp/apple-music-plus-frontend) & [apple-music-plus-backend](https://github.com/damienmauchamp/apple-music-plus-backend) for more.
+
 ## Build
 
 ```bash
@@ -24,4 +28,3 @@ Do not forget
 $ pm2 save
 $ pm2 startup
 ```
-
